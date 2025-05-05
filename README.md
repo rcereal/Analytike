@@ -1,0 +1,2 @@
+# Analytike
+ É uma aplicação web projetada para gerenciar datasets de maneira simples e eficiente. O sistema permite o upload de arquivos CSV, visualização detalhada dos dados em uma tabela interativa e a organização das informações de forma intuitiva. A plataforma oferece funcionalidades como a adição de novos datasets, visualização de dados em tempo real, e futuras implementações para filtros e paginação. Ideal para análise de dados e controle de grandes volumes de informações, com foco na usabilidade e integração com o backend para fácil manipulação de dados.
