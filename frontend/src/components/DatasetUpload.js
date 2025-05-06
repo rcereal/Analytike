@@ -29,16 +29,6 @@ const DatasetUpload = () => {
   return (
     <form onSubmit={handleUpload} className="mb-4">
       <div className="mb-3">
-        <label className="form-label">Nome do Dataset: </label>
-        <input
-          type="text"
-          className="form-control"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-3">
         <label className="form-label">Arquivo CSV: </label>
         <input
           type="file"
@@ -49,6 +39,16 @@ const DatasetUpload = () => {
             setArquivo(file);
             setNome(file.name);
           }}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Nome do Dataset: </label>
+        <input
+          type="text"
+          className="form-control"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
           required
         />
       </div>
