@@ -54,9 +54,20 @@ def analise_dataset(request, dataset_id):
     dataset = get_object_or_404(Dataset, pk=dataset_id)
 
     try:
+        # Carregar o arquivo CSV
         df = pd.read_csv(dataset.arquivo.path)
+
+        def safe_to_numeric(col):
+            try:
+                return pd.to_numeric(col)
+            except ValueError:
+                return col  # Retorna a coluna original se não for possível converter
+
+        # Aplicar a conversão para numérico em todas as colunas
+        df = df.apply(safe_to_numeric)
+
         total_linhas = len(df)
-        colunas_numericas = df.select_dtypes(include=[np.numer]).columns.tolist()
+        colunas_numericas = df.select_dtypes(include=["number"]).columns.tolist()
 
         resultados_analises = {}
 
@@ -68,7 +79,7 @@ def analise_dataset(request, dataset_id):
 
             outliers = serie_numerica[
                 (serie_numerica < (primeiro_quartil - 1.5 * intervalo_interquartil)) |
-                (serie_numerica> (terceiro_quartil + 1.5 * intervalo_interquartil))
+                (serie_numerica > (terceiro_quartil + 1.5 * intervalo_interquartil))
             ]
 
             resultados_analises[coluna] = {
@@ -81,13 +92,21 @@ def analise_dataset(request, dataset_id):
                 'quantidade_de_outliers': int(outliers.count())
             }
 
+        # Converter todos os valores numéricos de np.int64 para int e np.float64 para float
+        for coluna, analise in resultados_analises.items():
+            for chave, valor in analise.items():
+                if isinstance(valor, (np.int64, np.float64)):
+                    analise[chave] = float(valor) if isinstance(valor, np.float64) else int(valor)
+
         return JsonResponse({
             'total_linhas': total_linhas,
             'colunas_numericas': colunas_numericas,
             'analises': resultados_analises
         })
+
     except Exception as erro:
         return JsonResponse({'erro': f'Erro inesperado: {str(erro)}'}, status=500)
+
 
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]

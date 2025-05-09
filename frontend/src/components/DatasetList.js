@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DatasetViewer from "./DatasetViewer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Dashboard.css"; // você criará esse arquivo para o estilo refinado
 
 const DatasetList = () => {
   const [datasets, setDatasets] = useState([]);
@@ -13,15 +15,12 @@ const DatasetList = () => {
     buscarDatasets(paginaAtual, search);
   }, [paginaAtual, search]);
 
-  const buscarDatasets = async (pagina, search) => {
+  const buscarDatasets = async (pagina, searchTerm) => {
     try {
       const response = await axios.get(
         "http://localhost:8000/api/datasets-paginados/",
         {
-          params: {
-            page: pagina,
-            search: search, // Usando o parâmetro 'search' para busca por nome
-          },
+          params: { page: pagina, search: searchTerm },
         }
       );
       setDatasets(response.data.results);
@@ -38,66 +37,85 @@ const DatasetList = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Datasets Enviados</h2>
-
-      {/* Filtro de nome */}
-      <div className="mb-3">
-        <input
-          type="text"
-          className="form-control mb-3"
-          placeholder="Buscar por nome..."
-          value={search} // Usando 'search' para busca por nome
-          onChange={(e) => {
-            setPaginaAtual(1); // Resetando a página para 1 quando o nome mudar
-            setSearch(e.target.value); // Atualizando o filtro de busca
-          }}
-        />
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h3 className="logo">📊 DataBoard</h3>
+        <ul className="nav-links">
+          <li className="active">📁 Datasets</li>
+          <li>📈 Relatórios</li>
+          <li>⚙️ Configurações</li>
+        </ul>
       </div>
 
-      {/* Lista de datasets */}
-      <ul className="list-group">
-        {datasets.map((dataset) => (
-          <li
-            key={dataset.id}
-            className="list-group-item d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <strong>{dataset.nome}</strong> -{" "}
-              {new Date(dataset.criado_em).toLocaleString()}
-            </div>
+      {/* Main content */}
+      <div className="main-content">
+        {/* Navbar */}
+        <div className="navbar">
+          <input
+            type="text"
+            className="form-control search-bar"
+            placeholder="🔍 Buscar datasets..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <span className="user-info">👤 Admin</span>
+        </div>
+
+        {/* Título e lista */}
+        <div className="content">
+          <h2 className="title">📁 Meus Datasets</h2>
+
+          <div className="dataset-grid">
+            {datasets.map((dataset) => (
+              <div
+                key={dataset.id}
+                className={`dataset-card ${
+                  selectedDatasetId === dataset.id ? "selected" : ""
+                }`}
+                onClick={() => setSelectedDatasetId(dataset.id)}
+              >
+                <h5>{dataset.nome}</h5>
+                <p className="text-muted">
+                  Criado em: {new Date(dataset.criado_em).toLocaleDateString()}
+                </p>
+                <button className="btn btn-outline-primary btn-sm">
+                  Visualizar
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Paginação */}
+          <div className="pagination-wrapper">
             <button
-              className="btn btn-sm btn-primary"
-              onClick={() => setSelectedDatasetId(dataset.id)}
+              className="btn btn-secondary me-2"
+              onClick={() => irParaPagina(paginaAtual - 1)}
+              disabled={paginaAtual === 1}
             >
-              Visualizar
+              Anterior
             </button>
-          </li>
-        ))}
-      </ul>
+            <span>
+              Página {paginaAtual} de {totalPaginas}
+            </span>
+            <button
+              className="btn btn-secondary ms-2"
+              onClick={() => irParaPagina(paginaAtual + 1)}
+              disabled={paginaAtual === totalPaginas}
+            >
+              Próxima
+            </button>
+          </div>
 
-      {/* Paginação */}
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <button
-          className="btn btn-secondary"
-          disabled={paginaAtual === 1}
-          onClick={() => irParaPagina(paginaAtual - 1)}
-        >
-          Anterior
-        </button>
-        <span>
-          Página {paginaAtual} de {totalPaginas}
-        </span>
-        <button
-          className="btn btn-secondary"
-          disabled={paginaAtual === totalPaginas}
-          onClick={() => irParaPagina(paginaAtual + 1)}
-        >
-          Próxima
-        </button>
+          {/* Viewer */}
+          {selectedDatasetId && (
+            <div className="viewer-section">
+              <h4>🔍 Detalhes do Dataset</h4>
+              <DatasetViewer datasetId={selectedDatasetId} />
+            </div>
+          )}
+        </div>
       </div>
-
-      {selectedDatasetId && <DatasetViewer datasetId={selectedDatasetId} />}
     </div>
   );
 };
