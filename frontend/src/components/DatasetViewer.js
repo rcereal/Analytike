@@ -32,7 +32,7 @@ const DatasetViewer = ({ datasetId }) => {
           console.error("Erro na resposta da API:", err.response);
         }
       });
-  });
+  }, [datasetId]);
 
   return (
     <div className="container mt-4">
