@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DatasetViewer from "./DatasetViewer";
+import DatasetUpload from "./DatasetUpload";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Dashboard.css"; // você criará esse arquivo para o estilo refinado
+import "./Dashboard.css";
 
 const DatasetList = () => {
   const [datasets, setDatasets] = useState([]);
@@ -38,7 +39,6 @@ const DatasetList = () => {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
       <div className="sidebar">
         <h3 className="logo">📊 DataBoard</h3>
         <ul className="nav-links">
@@ -48,7 +48,6 @@ const DatasetList = () => {
         </ul>
       </div>
 
-      {/* Main content */}
       <div className="main-content">
         {/* Navbar */}
         <div className="navbar">
@@ -65,6 +64,11 @@ const DatasetList = () => {
         {/* Título e lista */}
         <div className="content">
           <h2 className="title">📁 Meus Datasets</h2>
+
+          <div className="content">
+            <h5>📤 Enviar novo Dataset</h5>
+            <DatasetUpload />
+          </div>
 
           <div className="dataset-grid">
             {datasets.map((dataset) => (
