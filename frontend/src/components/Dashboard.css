@@ -1,4 +1,7 @@
-/* Dashboard.css */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
 
 body {
   margin: 0;
@@ -113,4 +116,83 @@ body {
   padding: 20px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
+}
+
+/* 🌙 Tema Escuro */
+
+body.dark-theme {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+body.dark-theme .navbar {
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+body.dark-theme .sidebar {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-theme .sidebar .nav-links li {
+  color: #000000;
+}
+
+body.dark-theme .nav-links li {
+  color: #cbd5e1;
+}
+
+body.dark-theme .nav-links li:hover,
+body.dark-theme .nav-links .active {
+  color: #38bdf8;
+}
+
+body.dark-theme .main-content {
+  background-color: #0f172a;
+}
+
+body.dark-theme .content {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+body.dark-theme .dataset-card {
+  background-color: #1e293b;
+  border-color: #ffffff;
+  color: #f1f5f9;
+}
+
+body.dark-theme .dataset-card.selected {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px #38bdf8;
+}
+
+body.dark-theme .viewer-section {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-theme .btn-outline-primary {
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+body.dark-theme .btn-outline-primary:hover {
+  background-color: #38bdf8;
+  color: #0f172a;
+}
+
+body.dark-theme .form-control {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+body.dark-theme .form-control::placeholder {
+  color: #94a3b8;
+}
+
+body.dark-theme .form-check-label {
+  color: #f1f5f9;
 }
