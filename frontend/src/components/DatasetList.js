@@ -55,7 +55,7 @@ const DatasetList = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <h3 className="logo">📊 DataBoard</h3>
+        <h3 className="logo">📊 Analytike</h3>
         <ul className="nav-links">
           <li
             className={
@@ -112,12 +112,13 @@ const DatasetList = () => {
             <>
               <h2 className="title">📁 Meus Datasets</h2>
 
-              <div className="upload-section">
-                {" "}
-                {/* 🔧 Renomeado para evitar repetição de classe */}
-                <h5>📤 Enviar novo Dataset</h5>
-                <DatasetUpload />
-              </div>
+              {search.trim() === "" && (
+                <div className="upload-section">
+                  {" "}
+                  <h5>📤 Enviar novo Dataset</h5>
+                  <DatasetUpload />
+                </div>
+              )}
 
               <div className="dataset-grid">
                 {datasets.map((dataset) => (
@@ -128,13 +129,13 @@ const DatasetList = () => {
                     }`}
                     onClick={() => {
                       setSelectedDatasetId(dataset.id);
-                      setMostrarRelatorios(false); // 🔧 Garante que só um bloco apareça
+                      setMostrarRelatorios(false);
                       setMostrarConfiguracoes(false);
                     }}
-                    role="button" // 🔧 Acessibilidade
-                    tabIndex={0} // 🔧 Acessibilidade
+                    role="button"
+                    tabIndex={0}
                   >
-                    <h5>{dataset.nome}</h5>
+                    <h5 title={dataset.nome}>{dataset.nome}</h5>
                     <p className="text-muted">
                       Criado em:{" "}
                       {new Date(dataset.criado_em).toLocaleDateString()}
@@ -142,7 +143,7 @@ const DatasetList = () => {
                     <button
                       className="btn btn-outline-primary btn-sm"
                       onClick={(e) => {
-                        e.stopPropagation(); // 🔧 Evita conflito com onClick do card
+                        e.stopPropagation();
                         setSelectedDatasetId(dataset.id);
                         setMostrarRelatorios(false);
                         setMostrarConfiguracoes(false);
