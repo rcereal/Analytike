@@ -16,7 +16,14 @@ body {
 
 .sidebar {
   width: 220px;
-  background-color: #1e293b;
+  /* background-color: #1e293b; */
+  background: #1e293b;
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, 1) 0%,
+    rgba(30, 41, 59, 1) 49%,
+    rgba(0, 212, 255, 1) 100%
+  );
   color: white;
   padding: 20px;
 }
@@ -142,7 +149,10 @@ body.dark-theme .navbar {
 }
 
 body.dark-theme .sidebar {
-  background-color: #ffffff;
+  background-color: #ffffff; /* Ou a cor desejada para o sidebar no tema escuro */
+  background-image: none; /* Remove qualquer imagem de fundo, incluindo o gradiente */
+  background-repeat: no-repeat; /* Garante que a imagem não se repita (redundante aqui, mas boa prática) */
+  background-size: auto; /* Garante que o tamanho da imagem seja automático */
   color: #000000;
 }
 
