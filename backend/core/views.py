@@ -48,7 +48,29 @@ def visualizar_dataset(request, dataset_id):
         return JsonResponse({'erro': 'Erro ao processar o CSV. Verifique o formato.'}, status=400)
     except Exception as e:
         return JsonResponse({'erro': f'Erro inesperado: {str(e)}'}, status=500)
-    
+
+@api_view(['DELETE'])
+def excluir_dataset(request, dataset_id):
+    try:
+        dataset = Dataset.objects.get(pk=dataset_id)
+
+        caminho_arquivo = dataset.arquivo.path
+        try:
+            import gc
+            gc.collect()  
+            os.remove(caminho_arquivo)
+        except PermissionError:
+            return Response(
+                {"erro": "O arquivo está sendo usado por outro processo. Feche o arquivo e tente novamente."},
+                status=status.HTTP_423_LOCKED
+            )
+
+        dataset.delete() 
+        return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
+
+    except Dataset.DoesNotExist:
+        return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['GET'])
 def analise_dataset(request, dataset_id):
     dataset = get_object_or_404(Dataset, pk=dataset_id)

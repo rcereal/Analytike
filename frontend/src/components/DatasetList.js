@@ -52,6 +52,23 @@ const DatasetList = () => {
     }
   };
 
+  const excluirDataset = async (id) => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este dataset?"
+    );
+    if (!confirmar) return;
+
+    try {
+      await axios.delete(`http://localhost:8000/api/datasets/excluir/${id}/`);
+      setDatasets((prev) => prev.filter((ds) => ds.id !== id));
+      if (selectedDatasetId === id) setSelectedDatasetId(null);
+      alert("✅ Dataset excluído com sucesso!");
+    } catch (err) {
+      alert("❌ Erro ao excluir dataset.");
+      console.error("Erro ao excluir:", err);
+    }
+  };
+
   const gerarRelatorioPDF = async (datasetId, nome) => {
     try {
       const response = await axios.get(
@@ -176,6 +193,15 @@ const DatasetList = () => {
                       }}
                     >
                       Visualizar
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm ms-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        excluirDataset(dataset.id);
+                      }}
+                    >
+                      Excluir
                     </button>
                   </div>
                 ))}
