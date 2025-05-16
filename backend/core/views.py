@@ -111,6 +111,13 @@ def gerar_relatorio_pdf(request, dataset_id):
     dataset = get_object_or_404(Dataset, id=dataset_id)
     df = pd.read_csv(dataset.arquivo)
 
+    colunas_numericas = df.select_dtypes(include=[np.number]).columns
+    if not colunas_numericas.any():
+        return HttpResponse(
+            'Este dataset não contém colunas numéricas suficientes para gerar um relatorio.',
+            status=400
+        )
+
     analise = []
 
     for coluna in df.select_dtypes(include=[np.number]).columns:

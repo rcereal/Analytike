@@ -52,6 +52,32 @@ const DatasetList = () => {
     }
   };
 
+  const gerarRelatorioPDF = async (datasetId, nome) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/relatorios/gerar-pdf/${datasetId}/`,
+        { responseType: "blob" }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `relatorio_${nome}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert(
+          "⚠️ Este dataset não possui dados númericos suficientes para gerar um relatório."
+        );
+      } else {
+        alert("❌ Ocorreu um erro ao gerar o relatório. Tente novamente.");
+      }
+      console.error("Erro ao gerar PDF:", error);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <div className="sidebar">
@@ -136,7 +162,7 @@ const DatasetList = () => {
                     tabIndex={0}
                   >
                     <h5 title={dataset.nome}>{dataset.nome}</h5>
-                    <p className="text-muted">
+                    <p className="dataset-data">
                       Criado em:{" "}
                       {new Date(dataset.criado_em).toLocaleDateString()}
                     </p>
@@ -189,8 +215,29 @@ const DatasetList = () => {
           {/* Bloco de Relatórios */}
           {mostrarRelatorios && (
             <div className="relatorios">
-              <h4>📈 Relatórios</h4>
-              <p>Em breve você poderá gerar relatórios aqui.</p>
+              <h4>📈 Relatórios Disponíveis</h4>
+              <p className="mb-3">
+                Selecione um dataset para gerar o PDF do relatório:
+              </p>
+              <div className="dataset-grid">
+                {datasets.map((dataset) => (
+                  <div key={dataset.id} className="dataset-card">
+                    <h5 title={dataset.nome}>{dataset.nome}</h5>
+                    <p className="dataset-data">
+                      Criado em:{" "}
+                      {new Date(dataset.criado_em).toLocaleDateString()}
+                    </p>
+                    <button
+                      className="btn btn-success btn-sm"
+                      onClick={() =>
+                        gerarRelatorioPDF(dataset.id, dataset.nome)
+                      }
+                    >
+                      📄 Gerar Relatório
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

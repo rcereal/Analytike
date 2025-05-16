@@ -102,6 +102,10 @@ body {
   transition: box-shadow 0.2s;
 }
 
+.dataset-data {
+  color: #64748b;
+}
+
 .dataset-card h5 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -149,10 +153,10 @@ body.dark-theme .navbar {
 }
 
 body.dark-theme .sidebar {
-  background-color: #ffffff; /* Ou a cor desejada para o sidebar no tema escuro */
-  background-image: none; /* Remove qualquer imagem de fundo, incluindo o gradiente */
-  background-repeat: no-repeat; /* Garante que a imagem não se repita (redundante aqui, mas boa prática) */
-  background-size: auto; /* Garante que o tamanho da imagem seja automático */
+  background-color: #ffffff;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-size: auto;
   color: #000000;
 }
 
@@ -182,6 +186,10 @@ body.dark-theme .dataset-card {
   background-color: #1e293b;
   border-color: #ffffff;
   color: #f1f5f9;
+}
+
+body.dark-theme .dataset-data {
+  color: #cbd5e1;
 }
 
 body.dark-theme .dataset-card.selected {
