@@ -8,4 +8,5 @@ urlpatterns = [
     path('visualizar-dataset/<int:dataset_id>/', visualizar_dataset, name='visualizar_dataset'),
     path('datasets-paginados/', DatasetListAPI.as_view(), name='datasets-paginados'),
     path('analise/<int:dataset_id>/', analise_dataset, name='analise_dataset'),
+    path('relatorios/gerar-pdf/<int:dataset_id>/', gerar_relatorio_pdf, name='gerar_relatorio_pdf'),
 ]

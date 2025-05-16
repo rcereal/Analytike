@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
 import django_filters
-from django.http import JsonResponse
+from io import BytesIO
+from xhtml2pdf import pisa
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -13,16 +16,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from .models import Dataset
 from .serializers import DatasetSerializer
-
-# class DatasetUploadView(APIView):
-#     parser_classes = [MultiPartParser, FormParser]
-    
-#     def post(self, request, format=None):
-#         serializer = DatasetSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({'mensagem': 'CSV enviado com sucesso!'}, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_datasets(request):
@@ -107,6 +100,47 @@ def analise_dataset(request, dataset_id):
     except Exception as erro:
         return JsonResponse({'erro': f'Erro inesperado: {str(erro)}'}, status=500)
 
+def gerar_relatorio_pdf(request, dataset_id):
+    dataset = get_object_or_404(Dataset, id=dataset_id)
+    df = pd.read_csv(dataset.arquivo)
+
+    analise = []
+
+    for coluna in df.select_dtypes(include=[np.number]).columns:
+        valores = df[coluna].dropna()
+        if valores.empty:
+            continue
+
+        primeiro_quartil = valores.quantile(0.25)
+        terceiro_quartil = valores.quantile(0.75)
+        intervalo_interquartil = terceiro_quartil - primeiro_quartil
+        outliers = ((valores < (primeiro_quartil - 1.5 * intervalo_interquartil)) | (valores > (terceiro_quartil + 1.5 * intervalo_interquartil))).sum()
+
+        analise.append({
+            'nome': coluna,
+            'media': round(valores.mean(), 2),
+            'min': round(valores.min(), 2),
+            'max': round(valores.max(), 2),
+            'std': round(valores.std(), 2),
+            'moda': round(valores.mode()[0], 2) if not valores.mode().empty else 'N/A',
+            'nulos': df[coluna].isnull().sum(),
+            'outliers': int(outliers)
+        })
+
+        html = render_to_string('relatorio_pdf.html', {
+            'nome_dataset': dataset.nome,
+            'data_criacao': dataset.criado_em.strftime('%d/%m/%y'),
+            'total_linhas': len(df),
+            'analise': analise
+        })
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="relatorio_{dataset.nome}.pdf"'
+
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        if pisa_status.err:
+            return HttpResponse('Erro ao gerar PDF', status=500)
+        return response
 
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
