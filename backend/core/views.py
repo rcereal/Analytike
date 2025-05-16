@@ -1,6 +1,13 @@
 import pandas as pd
 import numpy as np
 import django_filters
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+import base64
+
 from io import BytesIO
 from xhtml2pdf import pisa
 from django.http import JsonResponse, HttpResponse
@@ -127,11 +134,32 @@ def gerar_relatorio_pdf(request, dataset_id):
             'outliers': int(outliers)
         })
 
+        imagens_graficos = []
+        for coluna in df.select_dtypes(include=[np.number]).columns:
+            plt.figure(figsize=(4, 3))
+            sns.histplot(df[coluna].dropna(), kde=True, color='skyblue')
+            plt.title(f'Distribuição: {coluna}')
+            plt.tight_layout()
+
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_png = buffer.getvalue()
+            buffer.close()
+            imagens_graficos.append(base64.b64encode(image_png).decode('utf-8'))
+            plt.close
+
+        dados_csv = df.head(20).to_dict(orient='records')
+        colunas_csv = list(df.columns)
+
         html = render_to_string('relatorio_pdf.html', {
             'nome_dataset': dataset.nome,
             'data_criacao': dataset.criado_em.strftime('%d/%m/%y'),
             'total_linhas': len(df),
-            'analise': analise
+            'analise': analise,
+            'dados_csv': dados_csv,
+            'colunas_csv': colunas_csv,
+            'graficos_base64': imagens_graficos
         })
 
         response = HttpResponse(content_type='application/pdf')

@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
@@ -86,5 +87,34 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <h2>Pré-visualização do Dataset</h2>
+    <table>
+      <thead>
+        <tr>
+          {% for col in colunas_csv %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for linha in dados_csv %}
+        <tr>
+          {% for col in colunas_csv %}
+          <td>{{ linha|get_item:col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Gráficos</h2>
+    {% for grafico in graficos_base64 %}
+    <div
+      style="page-break-inside: avoid; text-align: center; margin-bottom: 20px"
+    >
+      <img src="data:image/png;base64,{{ grafico }}" style="width: 400px" />
+    </div>
+    {% endfor %}
   </body>
 </html>
