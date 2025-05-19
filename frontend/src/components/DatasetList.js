@@ -143,7 +143,10 @@ const DatasetList = () => {
             className="form-control search-bar"
             placeholder="🔍 Buscar datasets..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setSelectedDatasetId(null);
+            }}
           />
           <span className="user-info">👤 Admin</span>
         </div>
