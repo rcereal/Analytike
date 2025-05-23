@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 @api_view(['POST'])
-@ensure_csrf_cookie  # <-- garante que o CSRF seja exigido, e o cookie esteja setado
+@ensure_csrf_cookie
 def login_view(request):
     print("Recebido CSRF token:", request.META.get("HTTP_X_CSRFTOKEN"))
     username = request.data.get("username")
