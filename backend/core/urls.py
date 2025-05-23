@@ -1,7 +1,11 @@
 from django.urls import path
 from .views import *
+from . import authentication_views
 
 urlpatterns = [
+    path("csrf/", csrf, name="csrf"),
+    path('login/', authentication_views.login_view),
+    path('logout/', authentication_views.logout_view),
     path('upload-csv/', DatasetUploadView.as_view(), name='upload-csv'),
     path('datasets-list/', DatasetListView.as_view(), name='dataset_list'),
     path('datasets/', get_datasets, name='datasets'),

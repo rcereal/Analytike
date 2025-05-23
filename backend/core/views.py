@@ -12,6 +12,7 @@ from io import BytesIO
 from xhtml2pdf import pisa
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -23,6 +24,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from .models import Dataset
 from .serializers import DatasetSerializer
+
+@ensure_csrf_cookie
+def csrf(request):
+    return JsonResponse({"message": "CSRF cookie set"})
 
 @api_view(['GET'])
 def get_datasets(request):
