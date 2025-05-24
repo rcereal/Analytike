@@ -1,42 +1,19 @@
-import React, { useState, useEffect } from "react"; // <== aqui está o que faltava
-import axios from "axios";
-
-// Configuração global do axios
-axios.defaults.withCredentials = true;
-axios.defaults.xsrfCookieName = "csrftoken";
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
+import React, { useState, useEffect } from "react";
+import api from "../services/axiosConfig";
 
 const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/csrf/");
+    // Garante que o CSRF cookie seja carregado no início
+    api.get("csrf/");
   }, []);
-
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
 
   const autenticar = async () => {
     try {
-      const csrfToken = getCookie("csrftoken");
-
-      const response = await axios.post(
-        "http://localhost:8000/api/login/",
-        { username, password },
-        {
-          withCredentials: true,
-          headers: {
-            "X-CSRFToken": csrfToken,
-          },
-        }
-      );
-
+      const response = await api.post("login/", { username, password });
       alert("✅ Login realizado!");
-      // localStorage.setItem("token", "logado");
       onLoginSuccess();
     } catch (error) {
       alert("❌ Usuário ou senha inválidos");

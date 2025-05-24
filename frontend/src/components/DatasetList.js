@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/axiosConfig";
 import DatasetViewer from "./DatasetViewer";
 import DatasetUpload from "./DatasetUpload";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -33,12 +33,9 @@ const DatasetList = ({ onLogout }) => {
 
   const buscarDatasets = async (pagina, searchTerm) => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/datasets-paginados/",
-        {
-          params: { page: pagina, search: searchTerm },
-        }
-      );
+      const response = await api.get("datasets-paginados/", {
+        params: { page: pagina, search: searchTerm },
+      });
       setDatasets(response.data.results);
       setTotalPaginas(Math.ceil(response.data.count / 10));
     } catch (error) {
@@ -52,36 +49,14 @@ const DatasetList = ({ onLogout }) => {
     }
   };
 
-  // Pega o token do cookie
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
-
   const handleLogout = async () => {
     try {
-      const csrfToken = getCookie("csrftoken");
-
-      await axios.post(
-        "http://localhost:8000/api/logout/",
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            "X-CSRFToken": csrfToken,
-          },
-        }
-      );
-
+      await api.post("logout/");
       localStorage.removeItem("token");
-      onLogout();
+      onLogout(); // volta para a tela de login
     } catch (error) {
       alert("Erro ao fazer logout.");
-      console.error(
-        "Erro ao deslogar:",
-        error.response || error.message || error
-      );
+      console.error("Erro ao deslogar:", error);
     }
   };
 
@@ -92,7 +67,7 @@ const DatasetList = ({ onLogout }) => {
     if (!confirmar) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/datasets/excluir/${id}/`);
+      await api.delete(`datasets/excluir/${id}/`);
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
       if (selectedDatasetId === id) setSelectedDatasetId(null);
       alert("✅ Dataset excluído com sucesso!");
@@ -104,10 +79,9 @@ const DatasetList = ({ onLogout }) => {
 
   const gerarRelatorioPDF = async (datasetId, nome) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/relatorios/gerar-pdf/${datasetId}/`,
-        { responseType: "blob" }
-      );
+      const response = await api.get(`relatorios/gerar-pdf/${datasetId}/`, {
+        responseType: "blob",
+      });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
@@ -117,12 +91,12 @@ const DatasetList = ({ onLogout }) => {
       link.click();
       link.remove();
     } catch (error) {
-      if (error.response && error.response.status === 400) {
+      if (error.response?.status === 400) {
         alert(
-          "⚠️ Este dataset não possui dados númericos suficientes para gerar um relatório."
+          "⚠️ Dataset sem dados numéricos suficientes para gerar relatório."
         );
       } else {
-        alert("❌ Ocorreu um erro ao gerar o relatório. Tente novamente.");
+        alert("❌ Erro ao gerar relatório.");
       }
       console.error("Erro ao gerar PDF:", error);
     }
@@ -192,7 +166,6 @@ const DatasetList = ({ onLogout }) => {
         </div>
 
         <div className="content">
-          {/* Conteúdo principal */}
           {!mostrarRelatorios && !mostrarConfiguracoes && (
             <>
               <h2 className="title">📁 Meus Datasets</h2>
@@ -229,8 +202,6 @@ const DatasetList = ({ onLogout }) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedDatasetId(dataset.id);
-                        setMostrarRelatorios(false);
-                        setMostrarConfiguracoes(false);
                       }}
                     >
                       Visualizar

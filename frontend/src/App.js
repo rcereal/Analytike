@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatasetList from "./components/DatasetList";
 import Login from "./components/Login";
-import axios from "axios";
+import api from "./services/axiosConfig";
 
 function App() {
   const [autenticado, setAutenticado] = useState(null);
@@ -10,22 +10,9 @@ function App() {
   useEffect(() => {
     const verificarSessao = async () => {
       try {
-        await axios.get("http://localhost:8000/api/csrf/", {
-          withCredentials: true,
-        });
-
-        const response = await axios.get(
-          "http://localhost:8000/api/verificar-sessao/",
-          { withCredentials: true }
-        );
-
-        console.log("Resposta da verificação de sessão:", response.data);
-
-        if (response.data.autenticado) {
-          setAutenticado(true);
-        } else {
-          setAutenticado(false);
-        }
+        await api.get("csrf/");
+        const response = await api.get("verificar-sessao/");
+        setAutenticado(response.data.autenticado);
       } catch (error) {
         console.error("Erro ao verificar sessão:", error);
         setAutenticado(false);
@@ -36,7 +23,7 @@ function App() {
   }, []);
 
   if (autenticado === null) {
-    return <p className="text-center mt-5">🔄 Verificando sessão...</p>; // ou um loader
+    return <p className="text-center mt-5">🔄 Verificando sessão...</p>;
   }
 
   return (
