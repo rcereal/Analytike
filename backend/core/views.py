@@ -13,6 +13,8 @@ from xhtml2pdf import pisa
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_GET
 from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -28,6 +30,12 @@ from .serializers import DatasetSerializer
 @ensure_csrf_cookie
 def csrf(request):
     return JsonResponse({"message": "CSRF cookie set"})
+
+@ensure_csrf_cookie
+@require_GET
+def verificar_sessao(request):
+    autenticado = request.user.is_authenticated
+    return JsonResponse({'autenticado': autenticado})
 
 @api_view(['GET'])
 def get_datasets(request):

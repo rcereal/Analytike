@@ -18,6 +18,7 @@ def login_view(request):
     else:
         return JsonResponse({"erro": "Usuário ou senha inválidos"}, status=401)
 
+
 @api_view(['POST'])
 def logout_view(request):
     logout(request)

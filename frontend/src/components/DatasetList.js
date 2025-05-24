@@ -5,7 +5,7 @@ import DatasetUpload from "./DatasetUpload";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
-const DatasetList = () => {
+const DatasetList = ({ onLogout }) => {
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -49,6 +49,39 @@ const DatasetList = () => {
   const irParaPagina = (novaPagina) => {
     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
       setPaginaAtual(novaPagina);
+    }
+  };
+
+  // Pega o token do cookie
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  const handleLogout = async () => {
+    try {
+      const csrfToken = getCookie("csrftoken");
+
+      await axios.post(
+        "http://localhost:8000/api/logout/",
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+      onLogout();
+    } catch (error) {
+      alert("Erro ao fazer logout.");
+      console.error(
+        "Erro ao deslogar:",
+        error.response || error.message || error
+      );
     }
   };
 
@@ -105,7 +138,7 @@ const DatasetList = () => {
               !mostrarRelatorios && !mostrarConfiguracoes ? "active" : ""
             }
             onClick={() => {
-              setMostrarRelatorios(false); // 🔧 Voltar para datasets
+              setMostrarRelatorios(false);
               setMostrarConfiguracoes(false);
               setSelectedDatasetId(null);
             }}
@@ -115,7 +148,7 @@ const DatasetList = () => {
           <li
             className={mostrarRelatorios ? "active" : ""}
             onClick={() => {
-              setMostrarRelatorios(true); // 🔧 Exibir relatórios
+              setMostrarRelatorios(true);
               setMostrarConfiguracoes(false);
               setSelectedDatasetId(null);
             }}
@@ -125,7 +158,7 @@ const DatasetList = () => {
           <li
             className={mostrarConfiguracoes ? "active" : ""}
             onClick={() => {
-              setMostrarConfiguracoes(true); // 🔧 Exibir configurações
+              setMostrarConfiguracoes(true);
               setMostrarRelatorios(false);
               setSelectedDatasetId(null);
             }}
@@ -136,7 +169,6 @@ const DatasetList = () => {
       </div>
 
       <div className="main-content">
-        {/* Navbar */}
         <div className="navbar">
           <input
             type="text"
@@ -148,19 +180,25 @@ const DatasetList = () => {
               setSelectedDatasetId(null);
             }}
           />
-          <span className="user-info">👤 Admin</span>
+          <span className="user-info">
+            👤 Admin
+            <button
+              className="btn btn-outline-danger btn-sm ms-2"
+              onClick={handleLogout}
+            >
+              🔓 Sair
+            </button>
+          </span>
         </div>
 
-        {/* Conteúdo Principal */}
         <div className="content">
-          {/* Bloco Datasets */}
+          {/* Conteúdo principal */}
           {!mostrarRelatorios && !mostrarConfiguracoes && (
             <>
               <h2 className="title">📁 Meus Datasets</h2>
 
               {search.trim() === "" && (
                 <div className="upload-section">
-                  {" "}
                   <h5>📤 Enviar novo Dataset</h5>
                   <DatasetUpload />
                 </div>
@@ -210,7 +248,6 @@ const DatasetList = () => {
                 ))}
               </div>
 
-              {/* Paginação */}
               <div className="pagination-wrapper">
                 <button
                   className="btn btn-secondary me-2"
@@ -231,7 +268,6 @@ const DatasetList = () => {
                 </button>
               </div>
 
-              {/* Viewer */}
               {selectedDatasetId && (
                 <div className="viewer-section">
                   <h4>🔍 Detalhes do Dataset</h4>
@@ -241,7 +277,6 @@ const DatasetList = () => {
             </>
           )}
 
-          {/* Bloco de Relatórios */}
           {mostrarRelatorios && (
             <div className="relatorios">
               <h4>📈 Relatórios Disponíveis</h4>
@@ -270,7 +305,6 @@ const DatasetList = () => {
             </div>
           )}
 
-          {/* Bloco de Configurações */}
           {mostrarConfiguracoes && (
             <div className="configuracoes">
               <h4>⚙️ Configurações</h4>

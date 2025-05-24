@@ -36,7 +36,7 @@ const Login = ({ onLoginSuccess }) => {
       );
 
       alert("✅ Login realizado!");
-      localStorage.setItem("token", "logado");
+      // localStorage.setItem("token", "logado");
       onLoginSuccess();
     } catch (error) {
       alert("❌ Usuário ou senha inválidos");
