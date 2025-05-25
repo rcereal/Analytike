@@ -53,7 +53,7 @@ const DatasetList = ({ onLogout }) => {
     try {
       await api.post("logout/");
       localStorage.removeItem("token");
-      onLogout(); // volta para a tela de login
+      onLogout();
     } catch (error) {
       alert("Erro ao fazer logout.");
       console.error("Erro ao deslogar:", error);
@@ -154,15 +154,38 @@ const DatasetList = ({ onLogout }) => {
               setSelectedDatasetId(null);
             }}
           />
-          <span className="user-info">
-            👤 Admin
+          <div className="dropdown">
             <button
-              className="btn btn-outline-danger btn-sm ms-2"
-              onClick={handleLogout}
+              className="btn btn-outline-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              🔓 Sair
+              👤 Admin
             </button>
-          </span>
+            <ul
+              className="dropdown-menu dropdown-menu-end"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => alert("Ver perfil em breve!")}
+                >
+                  Ver Perfil
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item text-danger"
+                  onClick={handleLogout}
+                >
+                  Sair
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="content">
