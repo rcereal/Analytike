@@ -1,0 +1,1 @@
+web: gunicorn analytike_backend.wsgi
