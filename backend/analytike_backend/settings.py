@@ -1,4 +1,5 @@
 from pathlib import Path
+import dj_database_url
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -14,7 +15,7 @@ SECRET_KEY = 'django-insecure-88z)0%q*+i+td*rek6e99fy#^91&-hkl5^vjnwe%bo*20y_am$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["analytike_backend.onrender.com", "localhost"]
+ALLOWED_HOSTS = ["analytike.onrender.com", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -69,12 +70,7 @@ WSGI_APPLICATION = 'analytike_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'analytike_db',   # nome do banco que você criou
-        'USER': 'postgres',       # ou outro usuário criado
-        'PASSWORD': 'banana20',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        "default": dj_database_url.config(default=os.getenv("postgresql://analytike_db_user:425mBi5RDf1ONYSBc7RqMIrYTm3wxUyS@dpg-d2jq2rbe5dus738eab3g-a/analytike_db"))
     }
 }
 
