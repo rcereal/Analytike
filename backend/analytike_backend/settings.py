@@ -15,11 +15,8 @@ SECRET_KEY = 'django-insecure-88z)0%q*+i+td*rek6e99fy#^91&-hkl5^vjnwe%bo*20y_am$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    "analytike.onrender.com"
-]
+ALLOWED_HOSTS = ["*"]
+
 
 
 # Application definition
@@ -139,4 +136,5 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
+    "https://analytike.onrender.com",
 ]
