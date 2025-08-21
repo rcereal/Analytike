@@ -69,12 +69,12 @@ WSGI_APPLICATION = 'analytike_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_analytike',
-        'USER': 'root',
-        'PASSWORD': 'Banana20@',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'analytike_db',   # nome do banco que você criou
+        'USER': 'postgres',       # ou outro usuário criado
+        'PASSWORD': 'banana20',
         'HOST': 'localhost',
-        'PORT': '3306',
+        'PORT': '5432',
     }
 }
 
