@@ -71,7 +71,7 @@ WSGI_APPLICATION = 'analytike_backend.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgresql://analytike_db_user:425mBi5RDf1ONYSBc7RqMIrYTm3wxUyS@dpg-d2jq2rbe5dus738eab3g-a/analytike_db"
+        default="postgresql://analytike_db_user:425mBi5RDf1ONYSBc7RqMIrYTm3wxUyS@dpg-d2jq2rbe5dus738eab3g-a.oregon-postgres.render.com/analytike_db"
     )
 }
 
