@@ -69,20 +69,20 @@ WSGI_APPLICATION = 'analytike_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=os.environ.get('DATABASE_URL')
-#     )
-# }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
+}
 
 import dj_database_url
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        "postgresql://analytike_db_user:425mBi5RDf1ONYSBc7RqMIrYTm3wxUyS@dpg-d2jq2rbe5dus738eab3g-a.oregon-postgres.render.com/analytike_db",
-        conn_max_age=600,
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.parse(
+#         "postgresql://analytike_db_user:425mBi5RDf1ONYSBc7RqMIrYTm3wxUyS@dpg-d2jq2rbe5dus738eab3g-a.oregon-postgres.render.com/analytike_db",
+#         conn_max_age=600,
+#     )
+# }
 
 
 # Password validation
