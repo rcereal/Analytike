@@ -10,7 +10,9 @@ const DatasetViewer = ({ datasetId }) => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/visualizar-dataset/${datasetId}/`)
+      .get(
+        `https://analytike.onrender.com/api/visualizar-dataset/${datasetId}/`
+      )
       .then((res) => {
         console.log(res.data);
         setColunas(Array.isArray(res.data.colunas) ? res.data.colunas : []);
@@ -21,7 +23,7 @@ const DatasetViewer = ({ datasetId }) => {
       });
 
     axios
-      .get(`http://localhost:8000/api/analise/${datasetId}/`)
+      .get(`https://analytike.onrender.com/api/analise/${datasetId}/`)
       .then((res) => {
         setAnalise(res.data);
       })

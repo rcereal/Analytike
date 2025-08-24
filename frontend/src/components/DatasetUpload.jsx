@@ -12,7 +12,7 @@ const DatasetUpload = () => {
     formData.append("nome", nome);
 
     axios
-      .post("http://localhost:8000/api/upload-csv/", formData, {
+      .post("https://analytike.onrender.com/api/upload-csv/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then(() => {
