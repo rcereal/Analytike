@@ -3,34 +3,42 @@ import axios from "axios";
 import DatasetChart from "./DatasetChart";
 
 const DatasetViewer = ({ datasetId }) => {
-  // Inicializando com arrays vazios para evitar erros
   const [dados, setDados] = useState([]);
   const [colunas, setColunas] = useState([]);
   const [analise, setAnalise] = useState(null);
 
   useEffect(() => {
+    if (!datasetId) return;
+
+    // 🔄 Resetar estados ao trocar de dataset
+    setDados([]);
+    setColunas([]);
+    setAnalise(null);
+
+    console.log("🔄 Carregando datasetId:", datasetId);
+
     axios
       .get(
         `https://analytike.onrender.com/api/visualizar-dataset/${datasetId}/`
       )
       .then((res) => {
-        console.log(res.data);
+        console.log("📊 Dados recebidos:", res.data);
         setColunas(Array.isArray(res.data.colunas) ? res.data.colunas : []);
         setDados(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        console.error("Erro ao carregar dados do dataset:", err);
+        console.error("❌ Erro ao carregar dados do dataset:", err);
       });
 
     axios
       .get(`https://analytike.onrender.com/api/analise/${datasetId}/`)
       .then((res) => {
+        console.log("📈 Análise recebida:", res.data);
         setAnalise(res.data);
       })
       .catch((err) => {
-        console.error("Erro ao buscar análise do dataset:", err);
+        console.error("❌ Erro ao buscar análise do dataset:", err);
         if (err.response) {
-          // Se o erro tiver uma resposta, você pode verificar o status e o conteúdo
           console.error("Erro na resposta da API:", err.response);
         }
       });
@@ -42,7 +50,11 @@ const DatasetViewer = ({ datasetId }) => {
 
       <div className="card mb-4 shadow-sm p-3">
         <h5 className="mb-3">Gráfico de Visualização</h5>
-        <DatasetChart dados={dados} colunas={colunas} />
+        {colunas.length > 0 && dados.length > 0 ? (
+          <DatasetChart dados={dados} colunas={colunas} />
+        ) : (
+          <p>Nenhum dado disponível para exibir o gráfico.</p>
+        )}
       </div>
 
       <div className="card mb-4 shadow-sm p-3">
@@ -69,7 +81,7 @@ const DatasetViewer = ({ datasetId }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={colunas.length}>Nenhum dado disponível</td>
+                  <td colSpan={colunas.length || 1}>Nenhum dado disponível</td>
                 </tr>
               )}
             </tbody>
