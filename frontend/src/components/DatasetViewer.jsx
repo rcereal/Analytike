@@ -3,37 +3,38 @@ import axios from "axios";
 import DatasetChart from "./DatasetChart";
 
 const DatasetViewer = ({ datasetId }) => {
-  // Inicializando com arrays vazios para evitar erros
   const [dados, setDados] = useState([]);
   const [colunas, setColunas] = useState([]);
   const [analise, setAnalise] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(
-        `https://analytike.onrender.com/api/visualizar-dataset/${datasetId}/`
-      )
-      .then((res) => {
-        console.log(res.data);
-        setColunas(Array.isArray(res.data.colunas) ? res.data.colunas : []);
-        setDados(Array.isArray(res.data.data) ? res.data.data : []);
-      })
-      .catch((err) => {
-        console.error("Erro ao carregar dados do dataset:", err);
-      });
+    if (!datasetId) return;
 
-    axios
-      .get(`https://analytike.onrender.com/api/analise/${datasetId}/`)
-      .then((res) => {
-        setAnalise(res.data);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar análise do dataset:", err);
-        if (err.response) {
-          // Se o erro tiver uma resposta, você pode verificar o status e o conteúdo
-          console.error("Erro na resposta da API:", err.response);
-        }
-      });
+    // Limpa os dados antigos antes de buscar novos
+    setDados([]);
+    setColunas([]);
+    setAnalise(null);
+
+    const fetchData = async () => {
+      try {
+        const [resDados, resAnalise] = await Promise.all([
+          axios.get(
+            `https://analytike.onrender.com/api/visualizar-dataset/${datasetId}/`
+          ),
+          axios.get(`https://analytike.onrender.com/api/analise/${datasetId}/`),
+        ]);
+
+        setColunas(
+          Array.isArray(resDados.data.colunas) ? resDados.data.colunas : []
+        );
+        setDados(Array.isArray(resDados.data.data) ? resDados.data.data : []);
+        setAnalise(resAnalise.data);
+      } catch (err) {
+        console.error("Erro ao carregar dataset:", err);
+      }
+    };
+
+    fetchData();
   }, [datasetId]);
 
   return (
