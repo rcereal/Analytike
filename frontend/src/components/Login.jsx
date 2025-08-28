@@ -10,10 +10,11 @@ const Login = ({ onLoginSuccess }) => {
     api.get("csrf/");
   }, []);
 
-  const autenticar = async () => {
+  const autenticar = async (e) => {
+    if (e) e.preventDefault(); // Evita reload do form
     try {
       const response = await api.post("login/", { username, password });
-      alert("✅ Login realizado!");
+      console.log("✅ Login realizado com sucesso:", response.data);
       onLoginSuccess();
     } catch (error) {
       alert("❌ Usuário ou senha inválidos");
@@ -24,23 +25,25 @@ const Login = ({ onLoginSuccess }) => {
   return (
     <div className="container mt-5" style={{ maxWidth: "400px" }}>
       <h3 className="mb-4">Login</h3>
-      <input
-        type="text"
-        placeholder="Usuário"
-        className="form-control mb-3"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Senha"
-        className="form-control mb-3"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="btn btn-primary w-100" onClick={autenticar}>
-        Entrar
-      </button>
+      <form onSubmit={autenticar}>
+        <input
+          type="text"
+          placeholder="Usuário"
+          className="form-control mb-3"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          className="form-control mb-3"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit" className="btn btn-primary w-100">
+          Entrar
+        </button>
+      </form>
     </div>
   );
 };

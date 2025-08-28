@@ -265,7 +265,10 @@ const DatasetList = ({ onLogout }) => {
               {selectedDatasetId && (
                 <div className="viewer-section">
                   <h4>🔍 Detalhes do Dataset</h4>
-                  <DatasetViewer datasetId={selectedDatasetId} />
+                  <DatasetViewer
+                    key={selectedDatasetId}
+                    datasetId={selectedDatasetId}
+                  />
                 </div>
               )}
             </>
