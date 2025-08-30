@@ -67,13 +67,26 @@ const DatasetList = ({ onLogout }) => {
     if (!confirmar) return;
 
     try {
-      await api.delete(`datasets/excluir/${id}/`);
+      // 🔹 Axios com DELETE precisa do objeto de config (mesmo que vazio)
+      await api.delete(`datasets/excluir/${id}/`, {});
+
+      // Atualiza lista localmente
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
       if (selectedDatasetId === id) setSelectedDatasetId(null);
+
       alert("✅ Dataset excluído com sucesso!");
     } catch (err) {
-      alert("❌ Erro ao excluir dataset.");
-      console.error("Erro ao excluir:", err);
+      console.error("Erro ao excluir dataset:", err);
+
+      if (err.response) {
+        alert(
+          `❌ Erro ao excluir dataset: ${err.response.status} - ${
+            err.response.data?.erro || err.response.statusText
+          }`
+        );
+      } else {
+        alert("❌ Erro ao excluir dataset (falha de rede).");
+      }
     }
   };
 
