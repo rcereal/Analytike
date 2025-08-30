@@ -105,18 +105,11 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "https://analytike.onrender.com",
-    "https://analytike.vercel.app",  # 🔹 adicione também o domínio real do frontend
+    "https://analytike.vercel.app",  # 🔹 domínio real do frontend
 ]
 
-# 🔹 Configurações diferentes para DEV e PRODUÇÃO
-if not DEBUG:  # Produção no Render
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SAMESITE = "None"
-    SESSION_COOKIE_SAMESITE = "None"
-else:  # Desenvolvimento local
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SAMESITE = "None"
-    SESSION_COOKIE_SAMESITE = "None"
-
+# 🔹 Cookies e CSRF sempre liberados para cross-domain
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
