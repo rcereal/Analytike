@@ -68,7 +68,7 @@ const DatasetList = ({ onLogout }) => {
 
     try {
       // 🔹 Axios com DELETE precisa do objeto de config (mesmo que vazio)
-      await api.delete(`datasets/excluir/${id}/`, {});
+      await api.delete(`/datasets/excluir/${id}/`, {});
 
       // Atualiza lista localmente
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));

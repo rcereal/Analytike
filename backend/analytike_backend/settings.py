@@ -98,6 +98,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://analytike.onrender.com",
+    "https://analytike.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
