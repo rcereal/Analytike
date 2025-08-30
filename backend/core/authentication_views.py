@@ -1,10 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
+# --- LOGIN ---
 @api_view(['POST'])
-@ensure_csrf_cookie
+@permission_classes([AllowAny])   # garante que não precisa estar logado
+@ensure_csrf_cookie               # garante que o CSRF cookie é setado
 def login_view(request):
     print("Recebido CSRF token:", request.META.get("HTTP_X_CSRFTOKEN"))
     username = request.data.get("username")
@@ -19,7 +22,9 @@ def login_view(request):
         return JsonResponse({"erro": "Usuário ou senha inválidos"}, status=401)
 
 
+# --- LOGOUT ---
 @api_view(['POST'])
+@permission_classes([AllowAny])   # permite logout mesmo sem sessão ativa
 def logout_view(request):
-    logout(request)
+    logout(request)  # apaga a sessão no banco e limpa cookies
     return JsonResponse({'mensagem': 'Logout realizado com sucesso!'})

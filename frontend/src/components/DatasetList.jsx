@@ -51,12 +51,11 @@ const DatasetList = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
-      await api.post("logout/");
-      localStorage.removeItem("token");
-      onLogout();
+      await api.post("logout/", {}); // 🔑 corpo vazio para forçar CSRF Header
+      onLogout(); // só atualiza o estado, não precisa mexer em localStorage
     } catch (error) {
-      alert("Erro ao fazer logout.");
-      console.error("Erro ao deslogar:", error);
+      console.error("Erro ao deslogar:", error.response || error);
+      alert("❌ Erro ao fazer logout.");
     }
   };
 
