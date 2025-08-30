@@ -10,12 +10,18 @@ const Login = ({ onLoginSuccess }) => {
     api.get("csrf/");
   }, []);
 
-  const autenticar = async (e) => {
-    if (e) e.preventDefault(); // Evita reload do form
+  const autenticar = async () => {
     try {
-      const response = await api.post("login/", { username, password });
-      console.log("✅ Login realizado com sucesso:", response.data);
-      onLoginSuccess();
+      await api.post("login/", { username, password });
+      console.log("✅ Login realizado com sucesso!");
+
+      // Confirma a sessão no backend
+      const response = await api.get("verificar-sessao/");
+      if (response.data.autenticado) {
+        onLoginSuccess();
+      } else {
+        console.error("Sessão não persistiu no backend.");
+      }
     } catch (error) {
       alert("❌ Usuário ou senha inválidos");
       console.error("Erro ao autenticar:", error);

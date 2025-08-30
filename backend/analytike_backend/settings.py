@@ -2,6 +2,22 @@ from pathlib import Path
 import dj_database_url
 import os
 
+# Tempo de vida da sessão (ajuste conforme sua necessidade)
+SESSION_COOKIE_AGE = 60 * 60 * 8  # 8 horas
+
+# Atualiza a expiração a cada request
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Segurança dos cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Necessário para funcionar com frontend em outro domínio (ex: Vercel)
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
