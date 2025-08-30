@@ -7,7 +7,7 @@ const Login = ({ onLoginSuccess }) => {
 
   useEffect(() => {
     // Garante que o CSRF cookie seja carregado no início
-    api.get("csrf/");
+    api.get("csrf/", { withCredentials: true });
   }, []);
 
   const autenticar = async (e) => {
