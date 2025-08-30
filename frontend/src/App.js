@@ -21,7 +21,7 @@ function App() {
 
     verificarSessao();
 
-    // Revalida a sessão a cada 5 minutos
+    // 🔹 Revalida sessão a cada 5 minutos
     const interval = setInterval(verificarSessao, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);

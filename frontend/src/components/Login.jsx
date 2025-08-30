@@ -10,7 +10,8 @@ const Login = ({ onLoginSuccess }) => {
     api.get("csrf/");
   }, []);
 
-  const autenticar = async () => {
+  const autenticar = async (e) => {
+    e.preventDefault(); // 🔴 evita reload da página
     try {
       await api.post("login/", { username, password });
       console.log("✅ Login realizado com sucesso!");
