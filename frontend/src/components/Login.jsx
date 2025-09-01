@@ -6,22 +6,24 @@ const Login = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    // Garante que o CSRF cookie seja carregado no início
-    api.get("csrf/", { withCredentials: true });
+    // 🔑 carrega o CSRF assim que a tela abrir
+    api.get("csrf/");
   }, []);
 
   const autenticar = async (e) => {
-    e.preventDefault(); // 🔴 evita reload da página
+    e.preventDefault();
     try {
+      // 🔑 login enviando cookies e CSRF
       await api.post("login/", { username, password });
+
       console.log("✅ Login realizado com sucesso!");
 
-      // Confirma a sessão no backend
+      // 🔑 verifica se a sessão persistiu no backend
       const response = await api.get("verificar-sessao/");
       if (response.data.autenticado) {
         onLoginSuccess();
       } else {
-        console.error("Sessão não persistiu no backend.");
+        console.error("❌ Sessão não persistiu no backend.");
       }
     } catch (error) {
       alert("❌ Usuário ou senha inválidos");
