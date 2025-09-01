@@ -8,11 +8,14 @@ SESSION_SAVE_EVERY_REQUEST = True  # renova a cada request
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-88z)0%q*+i+td*rek6e99fy#^91&-hkl5^vjnwe%bo*20y_am$'
+SECRET_KEY = os.environ.get("SECRET_KEY", "chave-fake-dev")  # ✅ em produção, usar SECRET_KEY do Render
 
-DEBUG = True  # ⚠️ troque para False no Render
+DEBUG = False  # 🚨 DESATIVE em produção!
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "analytike.onrender.com",  # backend no Render
+    "analytike.vercel.app",    # frontend no Vercel
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -77,7 +80,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
@@ -93,23 +95,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# --- CORS e CSRF ---
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://analytike.onrender.com",
-    "https://analytike.vercel.app",
+    "https://analytike.vercel.app",  # frontend
 ]
-
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    "https://analytike.vercel.app",
     "https://analytike.onrender.com",
-    "https://analytike.vercel.app",  # 🔹 domínio real do frontend
 ]
 
-# 🔹 Cookies e CSRF sempre liberados para cross-domain
+# 🔹 Cookies cross-domain (backend -> frontend)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
+
+# 🔹 Nomes explícitos (evita conflito com cookies do Vercel)
+CSRF_COOKIE_NAME = "csrftoken"
+SESSION_COOKIE_NAME = "sessionid"
