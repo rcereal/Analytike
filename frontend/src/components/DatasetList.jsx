@@ -5,6 +5,13 @@ import DatasetUpload from "./DatasetUpload";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
+// 🔑 Função auxiliar para pegar cookie (CSRF)
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+};
+
 const DatasetList = ({ onLogout }) => {
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
@@ -66,8 +73,11 @@ const DatasetList = ({ onLogout }) => {
     if (!confirmar) return;
 
     try {
-      // 🔹 Axios com DELETE precisa do objeto de config (mesmo que vazio)
-      await api.delete(`/datasets/excluir/${id}/`, {});
+      // 🔑 DELETE precisa do CSRF header no Render
+      await api.delete(`/datasets/excluir/${id}/`, {
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        withCredentials: true,
+      });
 
       // Atualiza lista localmente
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
