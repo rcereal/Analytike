@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -112,8 +113,11 @@ def visualizar_dataset(request, dataset_id):
 #     except Dataset.DoesNotExist:
 #         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
+
+from django.utils.decorators import method_decorator
+
 @api_view(['DELETE'])
-@permission_classes([AllowAny])  # 🔑 Permite acesso mesmo sem autenticação
+@csrf_exempt   # ⬅️ ignora CSRF só para esta rota
 def excluir_dataset(request, dataset_id):
     try:
         dataset = Dataset.objects.get(pk=dataset_id)
@@ -121,7 +125,7 @@ def excluir_dataset(request, dataset_id):
         caminho_arquivo = dataset.arquivo.path
         try:
             import gc
-            gc.collect()  
+            gc.collect()
             os.remove(caminho_arquivo)
         except PermissionError:
             return Response(
@@ -129,11 +133,12 @@ def excluir_dataset(request, dataset_id):
                 status=status.HTTP_423_LOCKED
             )
 
-        dataset.delete() 
+        dataset.delete()
         return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
 
     except Dataset.DoesNotExist:
         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 def analise_dataset(request, dataset_id):

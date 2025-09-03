@@ -5,13 +5,6 @@ import DatasetUpload from "./DatasetUpload";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
-// 🔑 Função auxiliar para pegar cookie (CSRF)
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-};
-
 const DatasetList = ({ onLogout }) => {
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
@@ -58,8 +51,8 @@ const DatasetList = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
-      await api.post("logout/", {}); // 🔑 corpo vazio para forçar CSRF Header
-      onLogout(); // só atualiza o estado, não precisa mexer em localStorage
+      await api.post("logout/"); // 🔑 agora o CSRF já vai pelo interceptor
+      onLogout();
     } catch (error) {
       console.error("Erro ao deslogar:", error.response || error);
       alert("❌ Erro ao fazer logout.");
@@ -73,13 +66,8 @@ const DatasetList = ({ onLogout }) => {
     if (!confirmar) return;
 
     try {
-      // 🔑 DELETE precisa do CSRF header no Render
-      await api.delete(`/datasets/excluir/${id}/`, {
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        withCredentials: true,
-      });
+      await api.delete(`/datasets/excluir/${id}/`); // 🔑 interceptor cuida do CSRF
 
-      // Atualiza lista localmente
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
       if (selectedDatasetId === id) setSelectedDatasetId(null);
 
