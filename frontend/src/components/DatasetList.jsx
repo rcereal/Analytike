@@ -17,6 +17,20 @@ const DatasetList = ({ onLogout }) => {
     localStorage.getItem("tema") === "escuro"
   );
 
+  // 🔹 Garante que o CSRF seja setado quando o Dashboard abrir
+  useEffect(() => {
+    const fetchCSRF = async () => {
+      try {
+        await api.get("csrf/");
+        console.log("✅ CSRF cookie setado com sucesso");
+      } catch (err) {
+        console.error("❌ Erro ao buscar CSRF:", err);
+      }
+    };
+
+    fetchCSRF();
+  }, []);
+
   useEffect(() => {
     buscarDatasets(paginaAtual, search);
   }, [paginaAtual, search]);
@@ -51,7 +65,7 @@ const DatasetList = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
-      await api.post("logout/"); // 🔑 agora o CSRF já vai pelo interceptor
+      await api.post("logout/");
       onLogout();
     } catch (error) {
       console.error("Erro ao deslogar:", error.response || error);
@@ -66,8 +80,7 @@ const DatasetList = ({ onLogout }) => {
     if (!confirmar) return;
 
     try {
-      await api.delete(`/datasets/excluir/${id}/`); // 🔑 interceptor cuida do CSRF
-
+      await api.delete(`/datasets/excluir/${id}/`);
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
       if (selectedDatasetId === id) setSelectedDatasetId(null);
 
