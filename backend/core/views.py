@@ -21,7 +21,7 @@ from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status, generics, viewsets
@@ -115,30 +115,19 @@ def visualizar_dataset(request, dataset_id):
 
 
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Dataset
-import os
-import gc
 
 @api_view(['DELETE'])
-@csrf_exempt   # ⬅️ ignora CSRF só para esta rota
+@permission_classes([IsAuthenticated])  # 🔑 exige login
 def excluir_dataset(request, dataset_id):
-    # 🔎 Logs para debug
-    print("==== [DEBUG excluir_dataset] ====")
-    print("🔎 Método:", request.method)
-    print("🔎 URL:", request.build_absolute_uri())
-    print("🔎 Headers recebidos:", dict(request.headers))
-    print("🔎 Cookies recebidos:", request.COOKIES)
-    print("🔎 User autenticado:", request.user if request.user.is_authenticated else "Anônimo")
+    print("🔍 Usuário autenticado?", request.user.is_authenticated)
+    print("🔍 Usuário:", request.user)
 
     try:
         dataset = Dataset.objects.get(pk=dataset_id)
 
         caminho_arquivo = dataset.arquivo.path
         try:
+            import gc
             gc.collect()
             os.remove(caminho_arquivo)
         except PermissionError:
@@ -148,16 +137,10 @@ def excluir_dataset(request, dataset_id):
             )
 
         dataset.delete()
-        print("✅ Dataset excluído com sucesso:", dataset_id)
         return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
 
     except Dataset.DoesNotExist:
-        print("❌ Dataset não encontrado:", dataset_id)
         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-    except Exception as e:
-        print("❌ Erro inesperado:", str(e))
-        return Response({"erro": f"Erro inesperado: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
