@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     csrf, verificar_sessao, get_datasets, visualizar_dataset,
-    excluir_dataset, analise_dataset, gerar_relatorio_pdf,
+    Excluir_dataset_view, analise_dataset, gerar_relatorio_pdf,
     DatasetUploadView, DatasetListView, DatasetListAPI
 )
 from . import authentication_views
