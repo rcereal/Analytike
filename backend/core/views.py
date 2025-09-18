@@ -114,33 +114,40 @@ def visualizar_dataset(request, dataset_id):
 #         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 
-from django.utils.decorators import method_decorator
+@method_decorator(csrf_protect, name='dispatch') 
+def excluir_dataset(APIView):
+   permission_classes = [IsAuthenticated]
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])  # 🔑 exige login
-def excluir_dataset(request, dataset_id):
-    print("🔍 Usuário autenticado?", request.user.is_authenticated)
-    print("🔍 Usuário:", request.user)
+    def delete(self, request, dataset_id):
+        print("🔍 Usuário autenticado?", request.user.is_authenticated)
+        print("🔍 Usuário:", request.user)
 
-    try:
-        dataset = Dataset.objects.get(pk=dataset_id)
-
-        caminho_arquivo = dataset.arquivo.path
         try:
-            import gc
-            gc.collect()
-            os.remove(caminho_arquivo)
-        except PermissionError:
-            return Response(
-                {"erro": "O arquivo está sendo usado por outro processo. Feche o arquivo e tente novamente."},
-                status=status.HTTP_423_LOCKED
-            )
+            dataset = Dataset.objects.get(pk=dataset_id)
+            caminho_arquivo = dataset.arquivo.path
+            try:
+                import gc
+                gc.collect()
+                os.remove(caminho_arquivo)
+            except PermissionError:
+                return Response(
+                    {"erro": "O arquivo está sendo usado por outro processo. Feche o arquivo e tente novamente."},
+                    status=status.HTTP_423_LOCKED
+                )
+            except FileNotFoundError:
+                 return Response(
+                    {"erro": "O arquivo não foi encontrado. O registro será removido do banco de dados."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        dataset.delete()
-        return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
+            dataset.delete()
+            return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
 
-    except Dataset.DoesNotExist:
-        return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Dataset.DoesNotExist:
+            return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"erro": f'Erro inesperado: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['GET'])
