@@ -1,3 +1,5 @@
+// Seu código em src/components/DatasetList.jsx
+
 import React, { useEffect, useState } from "react";
 import api from "../services/axiosConfig";
 import DatasetViewer from "./DatasetViewer";
@@ -6,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
 const DatasetList = ({ onLogout }) => {
+  // ... (seus estados)
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -16,6 +19,34 @@ const DatasetList = ({ onLogout }) => {
   const [temaEscuro, setTemaEscuro] = useState(
     localStorage.getItem("tema") === "escuro"
   );
+
+  // 🔑 ADICIONE ESTE NOVO useEffect AQUI!
+  useEffect(() => {
+    const verificarSessao = async () => {
+      try {
+        const response = await api.get("verificar-sessao/");
+        const { autenticado } = response.data;
+
+        if (!autenticado) {
+          console.log("Sessão expirada. Redirecionando para login.");
+          // Se o usuário não estiver autenticado, chamamos onLogout
+          // para limpar o estado e levá-lo de volta à página de login
+          onLogout();
+        } else {
+          console.log("Sessão ativa.");
+        }
+      } catch (error) {
+        console.error("❌ Erro ao verificar sessão:", error);
+        // Em caso de erro na requisição (por exemplo, falha de rede),
+        // também redirecionamos para o login por segurança.
+        onLogout();
+      }
+    };
+
+    verificarSessao();
+  }, [onLogout]); // O array de dependências com onLogout garante que o efeito
+  // seja reexecutado se a função de logout mudar (o que não
+  // deve acontecer, mas é uma boa prática).
 
   // 🔹 Garante que o CSRF seja setado quando o Dashboard abrir
   useEffect(() => {
@@ -31,6 +62,7 @@ const DatasetList = ({ onLogout }) => {
     fetchCSRF();
   }, []);
 
+  // ... (o restante do seu código segue abaixo, sem mudanças)
   useEffect(() => {
     buscarDatasets(paginaAtual, search);
   }, [paginaAtual, search]);
@@ -44,7 +76,7 @@ const DatasetList = ({ onLogout }) => {
       localStorage.setItem("tema", "claro");
     }
   }, [temaEscuro]);
-
+  // ... (restante das funções e do JSX)
   const buscarDatasets = async (pagina, searchTerm) => {
     try {
       const response = await api.get("datasets-paginados/", {
