@@ -13,7 +13,7 @@ from io import BytesIO
 from xhtml2pdf import pisa
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
