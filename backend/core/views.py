@@ -114,7 +114,7 @@ def visualizar_dataset(request, dataset_id):
 #         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 
-@method_decorator(csrf_protect, name='dispatch') 
+# @method_decorator(csrf_protect, name='dispatch') 
 class Excluir_dataset_view(APIView):
     permission_classes = [IsAuthenticated]
 
