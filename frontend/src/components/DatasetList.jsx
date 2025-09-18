@@ -89,7 +89,7 @@ const DatasetList = ({ onLogout }) => {
   };
 
   const irParaPagina = (novaPagina) => {
-    if (novaPagina >= 1 && novaPagala <= totalPaginas) {
+    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
       setPaginaAtual(novaPagina);
     }
   };
