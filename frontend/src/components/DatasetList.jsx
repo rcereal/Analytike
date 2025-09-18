@@ -8,7 +8,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
 const DatasetList = ({ onLogout }) => {
-  // ... (seus estados)
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -20,52 +19,51 @@ const DatasetList = ({ onLogout }) => {
     localStorage.getItem("tema") === "escuro"
   );
 
-  // 🔑 ADICIONE ESTE NOVO useEffect AQUI!
+  // 🔑 NOVO ESTADO: controla a tela de carregamento
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ➡️ Combina a lógica de CSRF, sessão e busca de dados em um só lugar
   useEffect(() => {
-    const verificarSessao = async () => {
+    const setupSessionAndFetchData = async () => {
+      setIsLoading(true); // Inicia o estado de carregamento
       try {
+        // 1. Garante que o cookie CSRF está setado
+        await api.get("csrf/");
+        console.log("✅ CSRF cookie setado com sucesso");
+
+        // 2. Verifica a autenticação do usuário
         const response = await api.get("verificar-sessao/");
         const { autenticado } = response.data;
 
         if (!autenticado) {
           console.log("Sessão expirada. Redirecionando para login.");
-          // Se o usuário não estiver autenticado, chamamos onLogout
-          // para limpar o estado e levá-lo de volta à página de login
-          onLogout();
+          onLogout(); // Se não estiver autenticado, redireciona
         } else {
           console.log("Sessão ativa.");
+          // 3. Só busca os datasets se a sessão estiver ativa
+          buscarDatasets(paginaAtual, search);
         }
-      } catch (error) {
-        console.error("❌ Erro ao verificar sessão:", error);
-        // Em caso de erro na requisição (por exemplo, falha de rede),
-        // também redirecionamos para o login por segurança.
-        onLogout();
-      }
-    };
-
-    verificarSessao();
-  }, [onLogout]); // O array de dependências com onLogout garante que o efeito
-  // seja reexecutado se a função de logout mudar (o que não
-  // deve acontecer, mas é uma boa prática).
-
-  // 🔹 Garante que o CSRF seja setado quando o Dashboard abrir
-  useEffect(() => {
-    const fetchCSRF = async () => {
-      try {
-        await api.get("csrf/");
-        console.log("✅ CSRF cookie setado com sucesso");
       } catch (err) {
-        console.error("❌ Erro ao buscar CSRF:", err);
+        console.error("❌ Erro fatal no setup da sessão:", err);
+        // Em caso de qualquer erro no processo, assume-se que a sessão é inválida
+        onLogout();
+      } finally {
+        // 4. Desativa o estado de carregamento no final
+        setIsLoading(false);
       }
     };
 
-    fetchCSRF();
-  }, []);
+    // Inicia o processo quando o componente é montado
+    setupSessionAndFetchData();
 
-  // ... (o restante do seu código segue abaixo, sem mudanças)
-  useEffect(() => {
-    buscarDatasets(paginaAtual, search);
-  }, [paginaAtual, search]);
+    // As dependências 'paginaAtual' e 'search' agora não são necessárias neste useEffect,
+    // pois a função 'buscarDatasets' já será chamada no lugar certo (dentro do try/catch).
+  }, [onLogout]);
+
+  // Remover este useEffect duplicado, pois a sua lógica foi movida
+  // useEffect(() => {
+  //   buscarDatasets(paginaAtual, search);
+  // }, [paginaAtual, search]);
 
   useEffect(() => {
     if (temaEscuro) {
@@ -76,7 +74,8 @@ const DatasetList = ({ onLogout }) => {
       localStorage.setItem("tema", "claro");
     }
   }, [temaEscuro]);
-  // ... (restante das funções e do JSX)
+
+  // O restante das funções permanece o mesmo
   const buscarDatasets = async (pagina, searchTerm) => {
     try {
       const response = await api.get("datasets-paginados/", {
@@ -90,7 +89,7 @@ const DatasetList = ({ onLogout }) => {
   };
 
   const irParaPagina = (novaPagina) => {
-    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+    if (novaPagina >= 1 && novaPagala <= totalPaginas) {
       setPaginaAtual(novaPagina);
     }
   };
@@ -115,11 +114,9 @@ const DatasetList = ({ onLogout }) => {
       await api.delete(`/datasets/excluir/${id}/`);
       setDatasets((prev) => prev.filter((ds) => ds.id !== id));
       if (selectedDatasetId === id) setSelectedDatasetId(null);
-
       alert("✅ Dataset excluído com sucesso!");
     } catch (err) {
       console.error("Erro ao excluir dataset:", err);
-
       if (err.response) {
         alert(
           `❌ Erro ao excluir dataset: ${err.response.status} - ${
@@ -157,6 +154,23 @@ const DatasetList = ({ onLogout }) => {
     }
   };
 
+  // ➡️ RENDERIZAÇÃO CONDICIONAL
+  // Se estiver carregando, mostra a tela de loading
+  if (isLoading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="ms-3">Carregando...</p>
+      </div>
+    );
+  }
+
+  // Se o carregamento estiver completo, mostra o conteúdo principal
   return (
     <div className="dashboard-container">
       <div className="sidebar">
