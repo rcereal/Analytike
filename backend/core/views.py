@@ -115,7 +115,7 @@ def visualizar_dataset(request, dataset_id):
 
 
 @method_decorator(csrf_protect, name='dispatch') 
-def excluir_dataset(APIView):
+class Excluir_dataset_view(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, dataset_id):
