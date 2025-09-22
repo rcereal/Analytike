@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import base64
+import gc
 
 from io import BytesIO
 from xhtml2pdf import pisa
@@ -114,39 +115,31 @@ def visualizar_dataset(request, dataset_id):
 #         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 
-# @method_decorator(csrf_protect, name='dispatch') 
 class Excluir_dataset_view(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, dataset_id):
-        print("🔍 Usuário autenticado?", request.user.is_authenticated)
-        print("🔍 Usuário:", request.user)
-
         try:
             dataset = Dataset.objects.get(pk=dataset_id)
-            caminho_arquivo = dataset.arquivo.path
-            try:
-                import gc
-                gc.collect()
-                os.remove(caminho_arquivo)
-            except PermissionError:
+
+            if dataset.usuario != request.user:
                 return Response(
-                    {"erro": "O arquivo está sendo usado por outro processo. Feche o arquivo e tente novamente."},
-                    status=status.HTTP_423_LOCKED
+                    {'erro': 'Você não tem permissão para excluir este dataset.'},
+                    status=status.HTTP_403_FORBIDDEN
                 )
-            except FileNotFoundError:
-                 return Response(
-                    {"erro": "O arquivo não foi encontrado. O registro será removido do banco de dados."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            
+            caminho_arquivo = dataset.arquivo.path
+            if os.path.exists(caminho_arquivo):
+                os.remove(caminho_arquivo)
 
             dataset.delete()
-            return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
+
+            return Response({'mensagem': 'Dataset excluído com sucesso!'}, status=status.HTTP_204_NO_CONTENT)
 
         except Dataset.DoesNotExist:
-            return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'erro': 'Dataset nao encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({"erro": f'Erro inesperado: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'erro': f'Erro inesperado: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
