@@ -285,22 +285,30 @@ def gerar_relatorio_pdf(request, dataset_id):
 
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
+    # Adicione a permissão para garantir que apenas usuários autenticados possam fazer upload
+    permission_classes = [IsAuthenticated]
     
     def post(self, request, format=None):
         serializer = DatasetSerializer(data=request.data)
         if serializer.is_valid():
             arquivo = request.FILES.get('arquivo')
+            
             if not (arquivo.name.endswith('.csv') or arquivo.name.endswith('.xlsx')):
                 return Response({'erro': 'Apenas arquivos .csv ou .xlsx são permitidos.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            serializer.save()
-            return Response({'mensagem': 'CSV enviado com sucesso!'}, status=status.HTTP_201_CREATED)
+            
+            # 🔑 A alteração mais importante: associe o dataset ao usuário logado
+            # O 'request.user' é o objeto do usuário autenticado pelo Django
+            serializer.save(usuario=request.user)
+            
+            return Response({'mensagem': 'Dataset enviado com sucesso!'}, status=status.HTTP_201_CREATED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class DatasetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+    
 class DatasetListAPI(generics.ListAPIView):
     queryset = Dataset.objects.all().order_by('-criado_em')
     serializer_class = DatasetSerializer

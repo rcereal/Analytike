@@ -1,6 +1,9 @@
 from pathlib import Path
 import dj_database_url
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Tempo de vida da sessão (ajuste conforme sua necessidade)
 SESSION_COOKIE_AGE = 60 * 60 * 8  # 8 horas
@@ -63,7 +66,7 @@ WSGI_APPLICATION = 'analytike_backend.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
+        default=os.getenv("DATABASE_URL")
     )
 }
 
