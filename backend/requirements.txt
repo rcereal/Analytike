@@ -88,7 +88,6 @@ packaging==25.0
 pandas==2.2.3
 parso==0.8.4
 pathlib==1.0.1
-pdfminer.six==20231228
 pdfplumber==0.11.6
 pefile==2023.2.7
 pillow==11.2.1
@@ -112,6 +111,7 @@ pyHanko==0.27.1
 pyhanko-certvalidator==0.26.8
 pyinstaller==6.11.1
 pyinstaller-hooks-contrib==2024.11
+# pdfminer.six==20231228
 # PyMsgBox==1.0.9
 # PyMuPDF==1.25.4
 # pyparsing==3.2.3
@@ -122,12 +122,12 @@ pyinstaller-hooks-contrib==2024.11
 # PyRect==0.2.0
 # PyScreeze==1.0.1
 # PySimpleGUI==5.0.8.3
+# pytweening==1.2.0
+# pywin32==308
 python-bidi==0.6.6
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
-# pytweening==1.2.0
 pytz==2025.2
-# pywin32==308
 pywin32-ctypes==0.2.3
 pyxnat==1.6.3
 PyYAML==6.0.2
