@@ -4,6 +4,7 @@ import DatasetList from "./components/DatasetList";
 import TestDelete from "./components/TesteDelete";
 import Login from "./components/Login";
 import api from "./services/axiosConfig";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
   const [autenticado, setAutenticado] = useState(null);
@@ -31,7 +32,7 @@ function App() {
 
   // 🔑 Nova estrutura com rotas
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         <Route
           path="/login"
@@ -58,7 +59,7 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
