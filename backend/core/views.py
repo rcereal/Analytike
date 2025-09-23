@@ -30,6 +30,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from .models import Dataset
 from .serializers import DatasetSerializer
+from .permissions import IsAdminUser
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -113,35 +114,6 @@ def visualizar_dataset(request, dataset_id):
 
 #     except Dataset.DoesNotExist:
 #         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-
-class Excluir_dataset_view(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, dataset_id):
-        try:
-            dataset = Dataset.objects.get(pk=dataset_id)
-
-            if dataset.usuario != request.user:
-                return Response(
-                    {'erro': 'Você não tem permissão para excluir este dataset.'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            
-            caminho_arquivo = dataset.arquivo.path
-            if os.path.exists(caminho_arquivo):
-                os.remove(caminho_arquivo)
-
-            dataset.delete()
-
-            return Response({'mensagem': 'Dataset excluído com sucesso!'}, status=status.HTTP_204_NO_CONTENT)
-
-        except Dataset.DoesNotExist:
-            return Response({'erro': 'Dataset nao encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'erro': f'Erro inesperado: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 @api_view(['GET'])
 def analise_dataset(request, dataset_id):
@@ -282,11 +254,38 @@ def gerar_relatorio_pdf(request, dataset_id):
     except Exception as erro:
         return HttpResponse(f'Erro inesperado: {str(erro)}', status=500)
 
+
+class Excluir_dataset_view(APIView):
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request, dataset_id):
+        try:
+            dataset = Dataset.objects.get(pk=dataset_id)
+
+            if dataset.usuario != request.user:
+                return Response(
+                    {'erro': 'Você não tem permissão para excluir este dataset.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            caminho_arquivo = dataset.arquivo.path
+            if os.path.exists(caminho_arquivo):
+                os.remove(caminho_arquivo)
+
+            dataset.delete()
+
+            return Response({'mensagem': 'Dataset excluído com sucesso!'}, status=status.HTTP_204_NO_CONTENT)
+
+        except Dataset.DoesNotExist:
+            return Response({'erro': 'Dataset nao encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'erro': f'Erro inesperado: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    
 @method_decorator(csrf_exempt, name='dispatch')
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    # Adicione a permissão para garantir que apenas usuários autenticados possam fazer upload
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     
     def post(self, request, format=None):
         serializer = DatasetSerializer(data=request.data)

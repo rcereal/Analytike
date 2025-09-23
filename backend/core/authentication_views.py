@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # --- LOGIN ---
 @api_view(['POST'])
@@ -21,7 +21,7 @@ def login_view(request):
 
 # --- LOGOUT ---
 @api_view(['POST'])
-@permission_classes([AllowAny])  # permite logout mesmo sem sessão ativa
+@permission_classes([IsAuthenticated])  # permite logout mesmo sem sessão ativa
 def logout_view(request):
     logout(request)  # apaga a sessão no banco e limpa cookies
     return JsonResponse({'mensagem': 'Logout realizado com sucesso!'})
