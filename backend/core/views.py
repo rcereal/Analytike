@@ -282,7 +282,7 @@ def gerar_relatorio_pdf(request, dataset_id):
     except Exception as erro:
         return HttpResponse(f'Erro inesperado: {str(erro)}', status=500)
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     # Adicione a permissão para garantir que apenas usuários autenticados possam fazer upload
