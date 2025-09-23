@@ -112,22 +112,22 @@ pyHanko==0.27.1
 pyhanko-certvalidator==0.26.8
 pyinstaller==6.11.1
 pyinstaller-hooks-contrib==2024.11
-PyMsgBox==1.0.9
-PyMuPDF==1.25.4
-pyparsing==3.2.3
-pypdf==5.5.0
-PyPDF2==3.0.1
-pypdfium2==4.30.1
-pyperclip==1.9.0
-PyRect==0.2.0
-PyScreeze==1.0.1
-PySimpleGUI==5.0.8.3
+# PyMsgBox==1.0.9
+# PyMuPDF==1.25.4
+# pyparsing==3.2.3
+# pypdf==5.5.0
+# PyPDF2==3.0.1
+# pypdfium2==4.30.1
+# pyperclip==1.9.0
+# PyRect==0.2.0
+# PyScreeze==1.0.1
+# PySimpleGUI==5.0.8.3
 python-bidi==0.6.6
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
-pytweening==1.2.0
+# pytweening==1.2.0
 pytz==2025.2
-pywin32==308
+# pywin32==308
 pywin32-ctypes==0.2.3
 pyxnat==1.6.3
 PyYAML==6.0.2
