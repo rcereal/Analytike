@@ -17,7 +17,6 @@ DEBUG = False  # 🚨 DESATIVE em produção!
 
 ALLOWED_HOSTS = [
     "analytike.onrender.com",  # backend no Render
-    "analytike.vercel.app",    # frontend no Vercel
 ]
 
 INSTALLED_APPS = [
