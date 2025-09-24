@@ -22,7 +22,7 @@ from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser as DRFIsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser as DRFIsAdminUser
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status, generics, viewsets
