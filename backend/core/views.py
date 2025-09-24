@@ -22,7 +22,7 @@ from django.template.loader import render_to_string
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser as DRFIsAdminUser
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status, generics, viewsets
@@ -30,7 +30,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from .models import Dataset
 from .serializers import DatasetSerializer
-from .permissions import IsAdminUser
+# from .permissions import IsAdminUser 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -256,7 +256,7 @@ def gerar_relatorio_pdf(request, dataset_id):
 
 
 class Excluir_dataset_view(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [DRFIsAdminUser]
 
     def delete(self, request, dataset_id):
         try:
@@ -285,7 +285,7 @@ class Excluir_dataset_view(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class DatasetUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [IsAdminUser]
+    permission_classes = [DRFIsAdminUser]
     
     def post(self, request, format=None):
         serializer = DatasetSerializer(data=request.data)
