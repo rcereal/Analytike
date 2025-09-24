@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/axiosConfig";
 import DatasetChart from "./DatasetChart";
 
 const DatasetViewer = ({ datasetId }) => {
@@ -17,10 +17,8 @@ const DatasetViewer = ({ datasetId }) => {
 
     console.log("🔄 Carregando datasetId:", datasetId);
 
-    axios
-      .get(
-        `https://analytike.onrender.com/api/visualizar-dataset/${datasetId}/`
-      )
+    api
+      .get(`visualizar-dataset/${datasetId}/`)
       .then((res) => {
         console.log("📊 Dados recebidos:", res.data);
         setColunas(Array.isArray(res.data.colunas) ? res.data.colunas : []);
@@ -30,8 +28,8 @@ const DatasetViewer = ({ datasetId }) => {
         console.error("❌ Erro ao carregar dados do dataset:", err);
       });
 
-    axios
-      .get(`https://analytike.onrender.com/api/analise/${datasetId}/`)
+    api
+      .get(`analise/${datasetId}/`)
       .then((res) => {
         console.log("📈 Análise recebida:", res.data);
         setAnalise(res.data);

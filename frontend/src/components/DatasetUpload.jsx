@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../services/axiosConfig";
 
 const DatasetUpload = () => {
   const [arquivo, setArquivo] = useState(null);
@@ -11,8 +11,8 @@ const DatasetUpload = () => {
     formData.append("arquivo", arquivo);
     formData.append("nome", nome);
 
-    axios
-      .post("https://analytike.onrender.com/api/upload-csv/", formData, {
+    api
+      .post("upload-csv/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then(() => {
