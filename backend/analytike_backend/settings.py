@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Tempo de vida da sessão (ajuste conforme sua necessidade)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'httpss')
+USE_X_FORWARDED_HOST = True
+SECURE_SSL_REDIRECT = False
+
 SESSION_COOKIE_AGE = 60 * 60 * 8  # 8 horas
 SESSION_SAVE_EVERY_REQUEST = True  # renova a cada request
 
