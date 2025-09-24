@@ -10,15 +10,16 @@ const DatasetViewer = ({ datasetId }) => {
   useEffect(() => {
     if (!datasetId) return;
 
-    // 🔄 Resetar estados ao trocar de dataset
+    // Resetar estados ao trocar de dataset
     setDados([]);
     setColunas([]);
     setAnalise(null);
 
     console.log("🔄 Carregando datasetId:", datasetId);
 
+    // Requisição para os dados da tabela/gráfico
     api
-      .get(`visualizar-dataset/${datasetId}/`)
+      .get(`visualizar-dataset/${datasetId}/`) // ✅ URL CORRIGIDA (relativa)
       .then((res) => {
         console.log("📊 Dados recebidos:", res.data);
         setColunas(Array.isArray(res.data.colunas) ? res.data.colunas : []);
@@ -28,17 +29,15 @@ const DatasetViewer = ({ datasetId }) => {
         console.error("❌ Erro ao carregar dados do dataset:", err);
       });
 
+    // Requisição para a análise estatística
     api
-      .get(`analise/${datasetId}/`)
+      .get(`analise/${datasetId}/`) // ✅ URL CORRIGIDA (relativa)
       .then((res) => {
         console.log("📈 Análise recebida:", res.data);
         setAnalise(res.data);
       })
       .catch((err) => {
         console.error("❌ Erro ao buscar análise do dataset:", err);
-        if (err.response) {
-          console.error("Erro na resposta da API:", err.response);
-        }
       });
   }, [datasetId]);
 
