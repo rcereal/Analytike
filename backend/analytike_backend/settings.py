@@ -5,9 +5,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'httpss')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://analytike.vercel.app", 
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://analytike.vercel.app",
+]
+
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False
+
+# 🔹 Nomes explícitos (evita conflito com cookies do Vercel)
+CSRF_COOKIE_NAME = "csrftoken"
+SESSION_COOKIE_NAME = "sessionid"
 
 SESSION_COOKIE_AGE = 60 * 60 * 8  # 8 horas
 SESSION_SAVE_EVERY_REQUEST = True  # renova a cada request
@@ -100,22 +120,3 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# --- CORS e CSRF ---
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://analytike.vercel.app",  # frontend
-]
-CSRF_TRUSTED_ORIGINS = [
-    "https://analytike.vercel.app",
-    "https://analytike.onrender.com",
-]
-
-# 🔹 Cookies cross-domain (backend -> frontend)
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
-
-# 🔹 Nomes explícitos (evita conflito com cookies do Vercel)
-CSRF_COOKIE_NAME = "csrftoken"
-SESSION_COOKIE_NAME = "sessionid"
