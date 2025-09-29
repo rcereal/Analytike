@@ -38,6 +38,7 @@ Django==5.2
 django-cors-headers==4.7.0
 django-filter==25.1
 djangorestframework==3.16.0
+djangorestframework-simplejwt==5.5.1
 et_xmlfile==2.0.0
 etelemetry==0.3.1
 executing==2.1.0
