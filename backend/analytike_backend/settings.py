@@ -17,6 +17,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://analytike.vercel.app",
+    "https://analytike.onrender.com",
 ]
 
 SESSION_COOKIE_SAMESITE = 'None'
