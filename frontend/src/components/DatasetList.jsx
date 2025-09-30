@@ -1,5 +1,3 @@
-// // Seu código em src/components/DatasetList.jsx
-
 // import React, { useEffect, useState } from "react";
 // import api from "../services/axiosConfig";
 // import DatasetViewer from "./DatasetViewer";
@@ -18,52 +16,11 @@
 //   const [temaEscuro, setTemaEscuro] = useState(
 //     localStorage.getItem("tema") === "escuro"
 //   );
-
-//   // 🔑 NOVO ESTADO: controla a tela de carregamento
 //   const [isLoading, setIsLoading] = useState(true);
 
-//   // ➡️ Combina a lógica de CSRF, sessão e busca de dados em um só lugar
 //   useEffect(() => {
-//     const setupSessionAndFetchData = async () => {
-//       setIsLoading(true); // Inicia o estado de carregamento
-//       try {
-//         // 1. Garante que o cookie CSRF está setado
-//         await api.get("csrf/");
-//         console.log("✅ CSRF cookie setado com sucesso");
-
-//         // 2. Verifica a autenticação do usuário
-//         const response = await api.get("verificar-sessao/");
-//         const { autenticado } = response.data;
-
-//         if (!autenticado) {
-//           console.log("Sessão expirada. Redirecionando para login.");
-//           onLogout(); // Se não estiver autenticado, redireciona
-//         } else {
-//           console.log("Sessão ativa.");
-//           // 3. Só busca os datasets se a sessão estiver ativa
-//           buscarDatasets(paginaAtual, search);
-//         }
-//       } catch (err) {
-//         console.error("❌ Erro fatal no setup da sessão:", err);
-//         // Em caso de qualquer erro no processo, assume-se que a sessão é inválida
-//         onLogout();
-//       } finally {
-//         // 4. Desativa o estado de carregamento no final
-//         setIsLoading(false);
-//       }
-//     };
-
-//     // Inicia o processo quando o componente é montado
-//     setupSessionAndFetchData();
-
-//     // As dependências 'paginaAtual' e 'search' agora não são necessárias neste useEffect,
-//     // pois a função 'buscarDatasets' já será chamada no lugar certo (dentro do try/catch).
-//   }, [onLogout]);
-
-//   // Remover este useEffect duplicado, pois a sua lógica foi movida
-//   // useEffect(() => {
-//   //   buscarDatasets(paginaAtual, search);
-//   // }, [paginaAtual, search]);
+//     buscarDatasets(paginaAtual, search);
+//   }, [paginaAtual, search]);
 
 //   useEffect(() => {
 //     if (temaEscuro) {
@@ -75,8 +32,8 @@
 //     }
 //   }, [temaEscuro]);
 
-//   // O restante das funções permanece o mesmo
 //   const buscarDatasets = async (pagina, searchTerm) => {
+//     setIsLoading(true);
 //     try {
 //       const response = await api.get("datasets-paginados/", {
 //         params: { page: pagina, search: searchTerm },
@@ -84,7 +41,16 @@
 //       setDatasets(response.data.results);
 //       setTotalPaginas(Math.ceil(response.data.count / 10));
 //     } catch (error) {
-//       console.error("Erro ao buscar datasets:", error);
+//       if (error.response?.status === 401) {
+//         console.warn(
+//           "⚠️ Token expirado ou inválido. Redirecionando para login."
+//         );
+//         handleLogout();
+//       } else {
+//         console.error("Erro ao buscar datasets:", error);
+//       }
+//     } finally {
+//       setIsLoading(false);
 //     }
 //   };
 
@@ -94,14 +60,10 @@
 //     }
 //   };
 
-//   const handleLogout = async () => {
-//     try {
-//       await api.post("logout/");
-//       onLogout();
-//     } catch (error) {
-//       console.error("Erro ao deslogar:", error.response || error);
-//       alert("❌ Erro ao fazer logout.");
-//     }
+//   const handleLogout = () => {
+//     localStorage.removeItem("access_token");
+//     localStorage.removeItem("refresh_token");
+//     onLogout();
 //   };
 
 //   const excluirDataset = async (id) => {
@@ -154,8 +116,6 @@
 //     }
 //   };
 
-//   // ➡️ RENDERIZAÇÃO CONDICIONAL
-//   // Se estiver carregando, mostra a tela de loading
 //   if (isLoading) {
 //     return (
 //       <div
@@ -170,7 +130,6 @@
 //     );
 //   }
 
-//   // Se o carregamento estiver completo, mostra o conteúdo principal
 //   return (
 //     <div className="dashboard-container">
 //       <div className="sidebar">
@@ -265,7 +224,9 @@
 //               {search.trim() === "" && (
 //                 <div className="upload-section">
 //                   <h5>📤 Enviar novo Dataset</h5>
-//                   <DatasetUpload />
+//                   <DatasetUpload
+//                     onUploadSuccess={() => buscarDatasets(1, "")}
+//                   />
 //                 </div>
 //               )}
 
@@ -397,10 +358,12 @@ import React, { useEffect, useState } from "react";
 import api from "../services/axiosConfig";
 import DatasetViewer from "./DatasetViewer";
 import DatasetUpload from "./DatasetUpload";
+import { useAuth } from "../hooks/useAuth"; // 🔑 Hook centralizado
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
-const DatasetList = ({ onLogout }) => {
+const DatasetList = () => {
+  const { user, logout } = useAuth(); // 🔑 pega usuário e logout do hook
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -437,10 +400,8 @@ const DatasetList = ({ onLogout }) => {
       setTotalPaginas(Math.ceil(response.data.count / 10));
     } catch (error) {
       if (error.response?.status === 401) {
-        console.warn(
-          "⚠️ Token expirado ou inválido. Redirecionando para login."
-        );
-        handleLogout();
+        console.warn("⚠️ Token expirado ou inválido. Fazendo logout.");
+        logout();
       } else {
         console.error("Erro ao buscar datasets:", error);
       }
@@ -453,12 +414,6 @@ const DatasetList = ({ onLogout }) => {
     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
       setPaginaAtual(novaPagina);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    onLogout();
   };
 
   const excluirDataset = async (id) => {
@@ -585,7 +540,7 @@ const DatasetList = ({ onLogout }) => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              👤 Admin
+              👤 {user?.username || "Usuário"}
             </button>
             <ul
               className="dropdown-menu dropdown-menu-end"
@@ -600,10 +555,7 @@ const DatasetList = ({ onLogout }) => {
                 </button>
               </li>
               <li>
-                <button
-                  className="dropdown-item text-danger"
-                  onClick={handleLogout}
-                >
+                <button className="dropdown-item text-danger" onClick={logout}>
                   Sair
                 </button>
               </li>

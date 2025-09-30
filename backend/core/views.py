@@ -30,7 +30,19 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from .models import Dataset
 from .serializers import DatasetSerializer
-# from .permissions import IsAdminUser 
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def me(request):
+    user = request.user
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "is_superuser": user.is_superuser,
+        "is_staff": user.is_staff,
+    })
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -50,24 +62,6 @@ def get_datasets(request):
     data = [{'id': d.id, 'nome': d.nome, 'criado_em': d.criado_em} for d in datasets]
     return Response(data)
 
-# def visualizar_dataset(request, dataset_id):
-#     try:
-#         dataset = Dataset.objects.get(pk=dataset_id)
-#         df = pd.read_csv(dataset.arquivo.path)
-
-#         preview_df = df.head(100)
-
-#         data = preview_df.to_dict(orient='records')
-#         colunas = list(df.columns)
-
-#         return JsonResponse({'colunas': colunas, 'data': data})
-    
-#     except Dataset.DoesNotExist:
-#         return JsonResponse({'erro': 'Dataset não encontrado'}, status=404)
-#     except pd.errors.ParserError:
-#         return JsonResponse({'erro': 'Erro ao processar o CSV. Verifique o formato.'}, status=400)
-#     except Exception as e:
-#         return JsonResponse({'erro': f'Erro inesperado: {str(e)}'}, status=500)
 
 def visualizar_dataset(request, dataset_id):
     try:
@@ -91,29 +85,6 @@ def visualizar_dataset(request, dataset_id):
         return JsonResponse({'erro': 'Erro ao processar o arquivo. Verifique o formato.'}, status=400)
     except Exception as e:
         return JsonResponse({'erro': f'Erro inesperado: {str(e)}'}, status=500)
-
-
-# @api_view(['DELETE'])
-# def excluir_dataset(request, dataset_id):
-#     try:
-#         dataset = Dataset.objects.get(pk=dataset_id)
-
-#         caminho_arquivo = dataset.arquivo.path
-#         try:
-#             import gc
-#             gc.collect()  
-#             os.remove(caminho_arquivo)
-#         except PermissionError:
-#             return Response(
-#                 {"erro": "O arquivo está sendo usado por outro processo. Feche o arquivo e tente novamente."},
-#                 status=status.HTTP_423_LOCKED
-#             )
-
-#         dataset.delete() 
-#         return Response({"mensagem": "Dataset excluído com sucesso!"}, status=status.HTTP_204_NO_CONTENT)
-
-#     except Dataset.DoesNotExist:
-#         return Response({"erro": "Dataset não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def analise_dataset(request, dataset_id):
@@ -261,12 +232,6 @@ class Excluir_dataset_view(APIView):
     def delete(self, request, dataset_id):
         try:
             dataset = Dataset.objects.get(pk=dataset_id)
-
-            # if dataset.usuario != request.user:
-            #     return Response(
-            #         {'erro': 'Você não tem permissão para excluir este dataset.'},
-            #         status=status.HTTP_403_FORBIDDEN
-            #     )
             
             caminho_arquivo = dataset.arquivo.path
             if os.path.exists(caminho_arquivo):
@@ -295,8 +260,6 @@ class DatasetUploadView(APIView):
             if not (arquivo.name.endswith('.csv') or arquivo.name.endswith('.xlsx')):
                 return Response({'erro': 'Apenas arquivos .csv ou .xlsx são permitidos.'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # 🔑 A alteração mais importante: associe o dataset ao usuário logado
-            # O 'request.user' é o objeto do usuário autenticado pelo Django
             serializer.save(usuario=request.user)
             
             return Response({'mensagem': 'Dataset enviado com sucesso!'}, status=status.HTTP_201_CREATED)

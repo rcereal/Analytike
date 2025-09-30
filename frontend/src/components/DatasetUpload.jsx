@@ -1,15 +1,14 @@
 // import React, { useState } from "react";
 // import api from "../services/axiosConfig";
 
-// // Adicionamos a propriedade onUploadSuccess para atualizar a lista sem recarregar a página
 // const DatasetUpload = ({ onUploadSuccess }) => {
 //   const [arquivo, setArquivo] = useState(null);
 //   const [nome, setNome] = useState("");
-//   const [enviando, setEnviando] = useState(false); // Estado para feedback de carregamento
+//   const [enviando, setEnviando] = useState(false);
 
 //   const handleUpload = (e) => {
 //     e.preventDefault();
-//     setEnviando(true); // Inicia o feedback de envio
+//     setEnviando(true);
 
 //     const formData = new FormData();
 //     formData.append("arquivo", arquivo);
@@ -17,26 +16,24 @@
 
 //     api
 //       .post("upload-csv/", formData, {
-//         // ✅ URL CORRIGIDA (relativa)
 //         headers: { "Content-Type": "multipart/form-data" },
 //       })
 //       .then(() => {
-//         alert("Arquivo enviado com sucesso!");
+//         alert("✅ Arquivo enviado com sucesso!");
 //         setNome("");
 //         setArquivo(null);
-//         // Reseta o campo de arquivo no formulário
 //         document.querySelector('input[type="file"]').value = "";
 
 //         if (onUploadSuccess) {
-//           onUploadSuccess(); // ✅ Avisa o componente pai para recarregar a lista
+//           onUploadSuccess();
 //         }
 //       })
 //       .catch((err) => {
 //         console.error("Erro ao enviar arquivo:", err);
-//         alert("Falha no envio.");
+//         alert("❌ Falha no envio.");
 //       })
 //       .finally(() => {
-//         setEnviando(false); // Finaliza o feedback de envio
+//         setEnviando(false);
 //       });
 //   };
 
@@ -52,7 +49,6 @@
 //             const file = e.target.files[0];
 //             if (file) {
 //               setArquivo(file);
-//               // Preenche o nome automaticamente, mas permite edição
 //               if (!nome) {
 //                 setNome(file.name.replace(".csv", ""));
 //               }
@@ -80,43 +76,55 @@
 
 // export default DatasetUpload;
 
+// src/components/DatasetUpload.jsx
+
 import React, { useState } from "react";
 import api from "../services/axiosConfig";
+import { useAuth } from "../hooks/useAuth"; // 🔑 Hook centralizado
 
 const DatasetUpload = ({ onUploadSuccess }) => {
+  const { logout } = useAuth(); // 🔑 acesso ao logout global
   const [arquivo, setArquivo] = useState(null);
   const [nome, setNome] = useState("");
   const [enviando, setEnviando] = useState(false);
 
-  const handleUpload = (e) => {
+  const handleUpload = async (e) => {
     e.preventDefault();
+    if (!arquivo) {
+      alert("⚠️ Selecione um arquivo antes de enviar.");
+      return;
+    }
+
     setEnviando(true);
 
     const formData = new FormData();
     formData.append("arquivo", arquivo);
     formData.append("nome", nome);
 
-    api
-      .post("upload-csv/", formData, {
+    try {
+      await api.post("upload-csv/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then(() => {
-        alert("✅ Arquivo enviado com sucesso!");
-        setNome("");
-        setArquivo(null);
-        document.querySelector('input[type="file"]').value = "";
-
-        if (onUploadSuccess) {
-          onUploadSuccess();
-        }
-      })
-      .catch((err) => {
-        console.error("Erro ao enviar arquivo:", err);
-        alert("❌ Falha no envio.");
-      })
-      .finally(() => {
-        setEnviando(false);
       });
+
+      alert("✅ Arquivo enviado com sucesso!");
+      setNome("");
+      setArquivo(null);
+      document.querySelector('input[type="file"]').value = "";
+
+      if (onUploadSuccess) {
+        onUploadSuccess(); // 🔄 Atualiza lista no DatasetList
+      }
+    } catch (err) {
+      console.error("Erro ao enviar arquivo:", err);
+      if (err.response?.status === 401) {
+        alert("⚠️ Sessão expirada. Faça login novamente.");
+        logout(); // 🔑 Se o token expirou, faz logout automático
+      } else {
+        alert("❌ Falha no envio.");
+      }
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (

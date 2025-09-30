@@ -1,30 +1,22 @@
-// import React, { useState, useEffect } from "react";
+// import React, { useState } from "react";
 // import api from "../services/axiosConfig";
 
 // const Login = ({ onLoginSuccess }) => {
 //   const [username, setUsername] = useState("");
 //   const [password, setPassword] = useState("");
 
-//   useEffect(() => {
-//     // 🔑 carrega o CSRF assim que a tela abrir
-//     api.get("csrf/");
-//   }, []);
-
 //   const autenticar = async (e) => {
 //     e.preventDefault();
 //     try {
-//       // 🔑 login enviando cookies e CSRF
-//       await api.post("login/", { username, password });
+//       // 🔑 Faz login no endpoint do JWT
+//       const response = await api.post("token/", { username, password });
+
+//       // Salva tokens no localStorage
+//       localStorage.setItem("access_token", response.data.access);
+//       localStorage.setItem("refresh_token", response.data.refresh);
 
 //       console.log("✅ Login realizado com sucesso!");
-
-//       // 🔑 verifica se a sessão persistiu no backend
-//       const response = await api.get("verificar-sessao/");
-//       if (response.data.autenticado) {
-//         onLoginSuccess();
-//       } else {
-//         console.error("❌ Sessão não persistiu no backend.");
-//       }
+//       onLoginSuccess();
 //     } catch (error) {
 //       alert("❌ Usuário ou senha inválidos");
 //       console.error("Erro ao autenticar:", error);
@@ -59,30 +51,21 @@
 
 // export default Login;
 
-// -----------------------------------------
-
 import React, { useState } from "react";
-import api from "../services/axiosConfig";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = ({ onLoginSuccess }) => {
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const autenticar = async (e) => {
     e.preventDefault();
-    try {
-      // 🔑 Faz login no endpoint do JWT
-      const response = await api.post("token/", { username, password });
-
-      // Salva tokens no localStorage
-      localStorage.setItem("access_token", response.data.access);
-      localStorage.setItem("refresh_token", response.data.refresh);
-
-      console.log("✅ Login realizado com sucesso!");
+    const success = await login(username, password);
+    if (success) {
       onLoginSuccess();
-    } catch (error) {
+    } else {
       alert("❌ Usuário ou senha inválidos");
-      console.error("Erro ao autenticar:", error);
     }
   };
 
