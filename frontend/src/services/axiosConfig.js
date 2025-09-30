@@ -102,4 +102,41 @@ api.interceptors.request.use(
   }
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refresh = localStorage.getItem("refresh_token");
+        if (!refresh) {
+          console.warn("⚠️ Nenhum refresh_token encontrado. Deslogando.");
+          return Promise.reject(error);
+        }
+        const response = await axios.post(
+          "https://analytike.onrender.com/api/token/refresh/",
+          { refresh }
+        );
+
+        const newAcessToken = response.data.access;
+        localStorage.setItem("access_token", newAcessToken);
+
+        originalRequest.headers["Authorization"] = `Bearer ${newAcessToken}`;
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("❌ Erro ao tentar renovar token:", refreshError);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default api;
