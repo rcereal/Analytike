@@ -6,7 +6,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   const accessToken = localStorage.getItem("access_token");
-  const refresh_token = localStorage.getItem("refresh_token");
+  const refreshToken = localStorage.getItem("refresh_token"); // ✅ corrigido
 
   const login = async (username, password) => {
     try {
@@ -44,7 +44,7 @@ export function useAuth() {
   };
 
   const refreshAccessToken = async () => {
-    if (!refreshToken) return logout();
+    if (!refreshToken) return logout(); // ✅ agora funciona
 
     try {
       const res = await api.post("token/refresh/", { refresh: refreshToken });

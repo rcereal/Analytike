@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     get_datasets, visualizar_dataset,
     Excluir_dataset_view, analise_dataset, gerar_relatorio_pdf,
-    DatasetUploadView, DatasetListView, DatasetListAPI
+    DatasetUploadView, DatasetListView, DatasetListAPI, me
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
