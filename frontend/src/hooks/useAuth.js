@@ -6,7 +6,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token"); // ✅ corrigido
+  const refreshToken = localStorage.getItem("refresh_token");
 
   const login = async (username, password) => {
     try {
@@ -36,10 +36,14 @@ export function useAuth() {
       console.warn("⚠️ Erro ao invalidar refresh no backend:", err);
     }
 
+    // 🔑 Limpa tokens e usuário
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
+
+    // 🔑 Força redirect para tela de login
+    window.location.href = "/login";
   };
 
   const fetchUser = async () => {
@@ -53,7 +57,7 @@ export function useAuth() {
   };
 
   const refreshAccessToken = async () => {
-    if (!refreshToken) return logout(); // ✅ agora funciona
+    if (!refreshToken) return logout();
 
     try {
       const res = await api.post("token/refresh/", { refresh: refreshToken });
@@ -65,17 +69,6 @@ export function useAuth() {
       logout();
     }
   };
-
-  //   useEffect(() => {
-  //     const init = async () => {
-  //       if (accessToken) {
-  //         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-  //         await fetchUser();
-  //       }
-  //       setLoading(false);
-  //     };
-  //     init();
-  //   }, []);
 
   useEffect(() => {
     const init = async () => {
