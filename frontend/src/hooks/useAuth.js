@@ -26,7 +26,16 @@ export function useAuth() {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const refresh = localStorage.getItem("refresh_token");
+      if (refresh) {
+        await api.post("logout/", { refresh }); // 🔑 chama o backend para invalidar
+      }
+    } catch (err) {
+      console.warn("⚠️ Erro ao invalidar refresh no backend:", err);
+    }
+
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     delete api.defaults.headers.common["Authorization"];
