@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     get_datasets, visualizar_dataset,
     Excluir_dataset_view, analise_dataset, gerar_relatorio_pdf,
-    DatasetUploadView, DatasetListView, DatasetListAPI, me
+    DatasetUploadView, DatasetListView, DatasetListAPI, me_view
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -10,7 +10,7 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path("me/", me, name="me"),
+    path("me/", me_view, name="me"),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("upload-csv/", DatasetUploadView.as_view(), name="upload-csv"),

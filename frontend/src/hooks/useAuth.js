@@ -57,11 +57,28 @@ export function useAuth() {
     }
   };
 
+  //   useEffect(() => {
+  //     const init = async () => {
+  //       if (accessToken) {
+  //         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+  //         await fetchUser();
+  //       }
+  //       setLoading(false);
+  //     };
+  //     init();
+  //   }, []);
+
   useEffect(() => {
     const init = async () => {
       if (accessToken) {
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        await fetchUser();
+        try {
+          await fetchUser();
+        } catch {
+          logout(); // ✅ força logout se não conseguir buscar user
+        }
+      } else {
+        setUser(null);
       }
       setLoading(false);
     };

@@ -34,7 +34,7 @@ from .serializers import DatasetSerializer
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def me(request):
+def me_view(request):
     user = request.user
     return Response({
         "id": user.id,
@@ -227,7 +227,7 @@ def gerar_relatorio_pdf(request, dataset_id):
 
 
 class Excluir_dataset_view(APIView):
-    permission_classes = [DRFIsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, dataset_id):
         try:
