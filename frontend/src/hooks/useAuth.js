@@ -212,7 +212,9 @@ export function useAuth() {
 
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
+
       api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+
       await fetchUser();
       return true;
     } catch (err) {
@@ -223,16 +225,19 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await api.post("logout/");
+      const refresh = localStorage.getItem("refresh_token");
+      if (refresh) {
+        await api.post("logout/", { refresh });
+      }
     } catch (err) {
-      console.warn("⚠️ Erro ao invalidar sessão:", err);
+      console.warn("⚠️ Erro ao invalidar refresh no backend:", err);
     }
 
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
-    window.location.href = "/"; // 🔑 volta pra tela de login
+    window.location.href = "/"; // 🔑 volta para login
   };
 
   const fetchUser = async () => {
@@ -255,7 +260,7 @@ export function useAuth() {
       api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
       console.log("🔄 Token renovado automaticamente");
     } catch (err) {
-      console.error("❌ Token expirado — deslogando:", err);
+      console.error("❌ Erro ao renovar token:", err);
       logout();
     }
   };
@@ -277,19 +282,15 @@ export function useAuth() {
     init();
   }, []);
 
-  // 🕒 Verifica sessão a cada 1 minuto e renova se necessário
+  // 🔄 Renovação automática do token
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        await api.get("me/"); // testa se o token ainda é válido
-      } catch (error) {
-        if (error.response?.status === 401) {
-          console.warn("⚠️ Sessão expirada. Tentando renovar...");
-          await refreshAccessToken();
-        }
-      }
-    }, 60 * 1000); // verifica a cada 1 minuto
-
+    let interval;
+    if (refreshToken) {
+      // chama a cada 4 minutos (antes do vencimento atual)
+      interval = setInterval(() => {
+        refreshAccessToken();
+      }, 4 * 60 * 1000);
+    }
     return () => clearInterval(interval);
   }, [refreshToken]);
 
