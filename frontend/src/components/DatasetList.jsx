@@ -2,10 +2,12 @@
 // import api from "../services/axiosConfig";
 // import DatasetViewer from "./DatasetViewer";
 // import DatasetUpload from "./DatasetUpload";
+// import { useAuth } from "../hooks/useAuth"; // 🔑 Hook centralizado
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "./Dashboard.css";
 
-// const DatasetList = ({ onLogout }) => {
+// const DatasetList = () => {
+//   const { user, logout } = useAuth(); // 🔑 pega usuário e logout do hook
 //   const [datasets, setDatasets] = useState([]);
 //   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
 //   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -42,10 +44,8 @@
 //       setTotalPaginas(Math.ceil(response.data.count / 10));
 //     } catch (error) {
 //       if (error.response?.status === 401) {
-//         console.warn(
-//           "⚠️ Token expirado ou inválido. Redirecionando para login."
-//         );
-//         handleLogout();
+//         console.warn("⚠️ Token expirado ou inválido. Fazendo logout.");
+//         logout();
 //       } else {
 //         console.error("Erro ao buscar datasets:", error);
 //       }
@@ -58,12 +58,6 @@
 //     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
 //       setPaginaAtual(novaPagina);
 //     }
-//   };
-
-//   const handleLogout = () => {
-//     localStorage.removeItem("access_token");
-//     localStorage.removeItem("refresh_token");
-//     onLogout();
 //   };
 
 //   const excluirDataset = async (id) => {
@@ -190,7 +184,7 @@
 //               data-bs-toggle="dropdown"
 //               aria-expanded="false"
 //             >
-//               👤 Admin
+//               👤 {user?.username || "Usuário"}
 //             </button>
 //             <ul
 //               className="dropdown-menu dropdown-menu-end"
@@ -205,10 +199,7 @@
 //                 </button>
 //               </li>
 //               <li>
-//                 <button
-//                   className="dropdown-item text-danger"
-//                   onClick={handleLogout}
-//                 >
+//                 <button className="dropdown-item text-danger" onClick={logout}>
 //                   Sair
 //                 </button>
 //               </li>
@@ -358,12 +349,12 @@ import React, { useEffect, useState } from "react";
 import api from "../services/axiosConfig";
 import DatasetViewer from "./DatasetViewer";
 import DatasetUpload from "./DatasetUpload";
-import { useAuth } from "../hooks/useAuth"; // 🔑 Hook centralizado
+import { useAuth } from "../hooks/useAuth";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
 
 const DatasetList = () => {
-  const { user, logout } = useAuth(); // 🔑 pega usuário e logout do hook
+  const { user, logout } = useAuth();
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -569,7 +560,7 @@ const DatasetList = () => {
               <h2 className="title">📁 Meus Datasets</h2>
 
               {search.trim() === "" && (
-                <div className="upload-section">
+                <div className="upload-section mb-4">
                   <h5>📤 Enviar novo Dataset</h5>
                   <DatasetUpload
                     onUploadSuccess={() => buscarDatasets(1, "")}
@@ -577,44 +568,42 @@ const DatasetList = () => {
                 </div>
               )}
 
-              <div className="dataset-grid">
+              <div className="dataset-list">
                 {datasets.map((dataset) => (
                   <div
                     key={dataset.id}
-                    className={`dataset-card ${
-                      selectedDatasetId === dataset.id ? "selected" : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedDatasetId(dataset.id);
-                      setMostrarRelatorios(false);
-                      setMostrarConfiguracoes(false);
-                    }}
+                    className="dataset-item"
+                    onClick={() => setSelectedDatasetId(dataset.id)}
                     role="button"
                     tabIndex={0}
                   >
-                    <h5 title={dataset.nome}>{dataset.nome}</h5>
-                    <p className="dataset-data">
-                      Criado em:{" "}
-                      {new Date(dataset.criado_em).toLocaleDateString()}
-                    </p>
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedDatasetId(dataset.id);
-                      }}
-                    >
-                      Visualizar
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-sm ms-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        excluirDataset(dataset.id);
-                      }}
-                    >
-                      Excluir
-                    </button>
+                    <div className="info">
+                      <strong>{dataset.nome}</strong>
+                      <span>
+                        Criado em:{" "}
+                        {new Date(dataset.criado_em).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="actions">
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDatasetId(dataset.id);
+                        }}
+                      >
+                        Visualizar
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          excluirDataset(dataset.id);
+                        }}
+                      >
+                        Excluir
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -654,22 +643,26 @@ const DatasetList = () => {
               <p className="mb-3">
                 Selecione um dataset para gerar o PDF do relatório:
               </p>
-              <div className="dataset-grid">
+              <div className="dataset-list">
                 {datasets.map((dataset) => (
-                  <div key={dataset.id} className="dataset-card">
-                    <h5 title={dataset.nome}>{dataset.nome}</h5>
-                    <p className="dataset-data">
-                      Criado em:{" "}
-                      {new Date(dataset.criado_em).toLocaleDateString()}
-                    </p>
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() =>
-                        gerarRelatorioPDF(dataset.id, dataset.nome)
-                      }
-                    >
-                      📄 Gerar Relatório
-                    </button>
+                  <div key={dataset.id} className="dataset-item">
+                    <div className="info">
+                      <strong>{dataset.nome}</strong>
+                      <span>
+                        Criado em:{" "}
+                        {new Date(dataset.criado_em).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="actions">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() =>
+                          gerarRelatorioPDF(dataset.id, dataset.nome)
+                        }
+                      >
+                        📄 Gerar Relatório
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
