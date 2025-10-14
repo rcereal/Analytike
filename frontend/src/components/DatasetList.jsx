@@ -486,7 +486,7 @@ const DatasetList = () => {
               setSelectedDatasetId(null);
             }}
           >
-            📁 Datasets
+            📁 Arquivos de Dados
           </li>
           <li
             className={mostrarRelatorios ? "active" : ""}
@@ -557,7 +557,7 @@ const DatasetList = () => {
         <div className="content">
           {!mostrarRelatorios && !mostrarConfiguracoes && (
             <>
-              <h2 className="title">📁 Meus Datasets</h2>
+              <h2 className="title">📁 Meus Arquivos de Dados</h2>
 
               {search.trim() === "" && (
                 <div className="upload-section mb-4">
