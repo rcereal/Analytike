@@ -148,7 +148,7 @@ const DatasetUpload = ({ onUploadSuccess }) => {
         />
       </div>
       <div className="mb-3">
-        <label className="form-label">Nome do Dataset:</label>
+        <label className="form-label">Nome do Arquivo:</label>
         <input
           type="text"
           className="form-control"

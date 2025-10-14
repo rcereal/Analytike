@@ -55,7 +55,7 @@ const DatasetViewer = ({ datasetId }) => {
       </div>
 
       <div className="card mb-4 shadow-sm p-3">
-        <h5 className="mb-3">Tabela do Dataset</h5>
+        <h5 className="mb-3">Tabela do Arquivo de Dados</h5>
         <div className="table-responsive">
           <table className="table table-striped table-bordered">
             <thead className="thead-dark">

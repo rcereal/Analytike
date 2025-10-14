@@ -561,7 +561,7 @@ const DatasetList = () => {
 
               {search.trim() === "" && (
                 <div className="upload-section mb-4">
-                  <h5>📤 Enviar novo Dataset</h5>
+                  <h5>📤 Enviar novo Arquivo de Dados</h5>
                   <DatasetUpload
                     onUploadSuccess={() => buscarDatasets(1, "")}
                   />
@@ -630,7 +630,7 @@ const DatasetList = () => {
 
               {selectedDatasetId && (
                 <div className="viewer-section">
-                  <h4>🔍 Detalhes do Dataset</h4>
+                  <h4>🔍 Detalhes do Arquivo de Dados</h4>
                   <DatasetViewer datasetId={selectedDatasetId} />
                 </div>
               )}
@@ -641,7 +641,7 @@ const DatasetList = () => {
             <div className="relatorios">
               <h4>📈 Relatórios Disponíveis</h4>
               <p className="mb-3">
-                Selecione um dataset para gerar o PDF do relatório:
+                Selecione um arquivo de dados para gerar o PDF do relatório:
               </p>
               <div className="dataset-list">
                 {datasets.map((dataset) => (
