@@ -633,7 +633,7 @@ const DatasetList = () => {
                   <h4>🔍 Detalhes do Arquivo de Dados</h4>
                   <DatasetViewer datasetId={selectedDatasetId} />
                 </div>
-              )} */}
+              )}  */}
 
               {selectedDatasetId && (
                 <div className="viewer-section animate-fade">
