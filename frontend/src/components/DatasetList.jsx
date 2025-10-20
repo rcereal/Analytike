@@ -628,9 +628,24 @@ const DatasetList = () => {
                 </button>
               </div>
 
-              {selectedDatasetId && (
+              {/* {selectedDatasetId && (
                 <div className="viewer-section">
                   <h4>🔍 Detalhes do Arquivo de Dados</h4>
+                  <DatasetViewer datasetId={selectedDatasetId} />
+                </div>
+              )} */}
+
+              {selectedDatasetId && (
+                <div className="viewer-section animate-fade">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h4>🔍 Detalhes do Arquivo de Dados</h4>
+                    <button
+                      className=" btn btn-outline-secondary btn-sm"
+                      onClick={() => setSelectedDatasetId(null)}
+                    >
+                      ⬅️ Voltar para a lista
+                    </button>
+                  </div>
                   <DatasetViewer datasetId={selectedDatasetId} />
                 </div>
               )}

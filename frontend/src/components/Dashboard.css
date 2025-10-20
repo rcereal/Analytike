@@ -238,3 +238,30 @@ body.dark-theme .form-control::placeholder {
 body.dark-theme .form-check-label {
   color: #f1f5f9;
 }
+
+/* Botao de fechar graficos */
+.viewer-section button.btn-outline-secondary {
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.viewer-section button.btn-outline-secondary:hover {
+  background-color: #38bdf8;
+  color: white;
+  border-color: #38bdf8;
+}
+
+.animate-fade {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
